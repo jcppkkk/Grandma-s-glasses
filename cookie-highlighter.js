@@ -1,13 +1,20 @@
 var secondaryOptimalBuilding = function(best) {
-	var bestPrice = Game.ObjectsById[best].price;
 	var time = Game.ObjectsById.map(function(product) {
+		var waitProduct = (product.price - Game.cookies) / Game.cookiesPs;
 		if (product.id == best) {
-			return (product.price - Game.cookies) / Game.cookiesPs;
-		} else if (product.price > Game.cookies) {
-			return Number.MAX_VALUE;
+			/* Wait for best product */
+			return waitProduct;
 		} else {
-			var cookiesAfterBuy = Game.cookies - product.price;
-			return (bestPrice - cookiesAfterBuy) / (Game.cookiesPs + product.storedCps);
+			var bestPrice = Game.ObjectsById[best].price;
+			if (product.price > Game.cookies) {
+				/* Wait for secondary product, buy it and and wait for best product */
+				var waitBest = bestPrice / (Game.cookiesPs + product.storedCps);
+				return waitProduct + waitBest;
+			} else {
+				/* Buy secondary product and wait for best product */
+				var cookiesLeft = Game.cookies - product.price;
+				return (bestPrice - cookiesLeft) / (Game.cookiesPs + product.storedCps);
+			}
 		}
 	});
 	return time.indexOf(Math.min.apply(Math, time));
@@ -37,4 +44,6 @@ document.getElementById('sectionRight').onclick = function() {
 		optimalBuilding()
 	}, 50)
 };
-optimalBuilding();
+setInterval(function() {
+   optimalBuilding();
+}, 2000);
