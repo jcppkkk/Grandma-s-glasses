@@ -1,49 +1,72 @@
-var secondaryOptimalBuilding = function(best) {
-	var time = Game.ObjectsById.map(function(product) {
-		var waitProduct = (product.price - Game.cookies) / Game.cookiesPs;
-		if (product.id == best) {
-			/* Wait for best product */
-			return waitProduct;
+var optimalBuilding = function (target, cookies, cookiesPs) {
+	var stateAfterBought = [];
+	for (var i = Game.ObjectsN; i--;) {
+		var product = Game.ObjectsById[i];
+		if (i == target.id) {
+			/* Not buy any other product, just wait & buy target */
+			stateAfterBought[i] = {
+				id: i,
+				time: ((target.price - cookies) / cookiesPs),
+				cookies: 0,
+				cookiesPs: (cookiesPs + target.storedCps)
+			};
+		} else if (product.price > target.price) {
+			/* This product is more expansive than target, exclude. */
+			stateAfterBought[i] = {
+				id: null,
+				time: Number.MAX_VALUE,
+				cookies: null,
+				cookiesPs: null
+			};
+		} else if (product.price > cookies) {
+			/* wait & buy some product(optimizable) then wait & buy target */
+			var afterBp = optimalBuilding(product, cookies, cookiesPs);
+			stateAfterBought[i] = {
+				id: afterBp.id,
+				time: afterBp.time + ((target.price - afterBp.cookies) / afterBp.cookiesPs),
+				cookies: 0,
+				cookiesPs: (afterBp.cookiesPs + target.storedCps)
+			};
 		} else {
-			var bestPrice = Game.ObjectsById[best].price;
-			if (product.price > Game.cookies) {
-				/* Wait for secondary product, buy it and and wait for best product */
-				var waitBest = bestPrice / (Game.cookiesPs + product.storedCps);
-				return waitProduct + waitBest;
-			} else {
-				/* Buy secondary product and wait for best product */
-				var cookiesLeft = Game.cookies - product.price;
-				return (bestPrice - cookiesLeft) / (Game.cookiesPs + product.storedCps);
-			}
+			/* buy some product then wait & buy target */
+			stateAfterBought[i] = {
+				id: i,
+				time: ((target.price - (cookies - product.price)) / (cookiesPs + product.storedCps)),
+				cookies: 0,
+				cookiesPs: (cookiesPs + product.storedCps + target.storedCps)
+			};
 		}
+	}
+	var times = stateAfterBought.map(function (el) {
+		return el.time;
 	});
-	return time.indexOf(Math.min.apply(Math, time));
+	var minTimeId = times.indexOf(Math.min.apply(Math, times));
+	return stateAfterBought[minTimeId];
 };
-var optimalBuilding = function() {
-	var CP = Game.ObjectsById.map(function(product) {
+var highlightBuilding = function () {
+	var titleColor = [];
+	for (var i = Game.ObjectsN; i--; titleColor[i] = "") {}
+	var CP = Game.ObjectsById.map(function (product) {
 		return (product.storedCps / product.price);
 	});
-	var best = CP.indexOf(Math.max.apply(Math, CP));
-	var faster = -1;
-	if (Game.ObjectsById[best].price > Game.cookies) {
-		faster = secondaryOptimalBuilding(best);
+	var bestProductId = CP.indexOf(Math.max.apply(Math, CP));
+	var bestProduct = Game.ObjectsById[bestProductId];
+	if (bestProduct.price > Game.cookies) {
+		optimal = optimalBuilding(bestProduct, Game.cookies, Game.cookiesPs);
+		titleColor[optimal.id] = "Lime";
 	}
+	titleColor[bestProductId] = "yellow";
 	var titles = document.querySelectorAll(".content>.title:first-child");
-	[].forEach.call(titles, function(item, id) {
-		if (id == best) {
-			item.style.color = "yellow";
-		} else if (id == faster) {
-			item.style.color = "Lime";
-		} else {
-			item.style.color = "";
-		}
+	[].forEach.call(titles, function (title, id) {
+		title.style.color = titleColor[id];
 	});
 };
-document.getElementById('sectionRight').onclick = function() {
-	setTimeout(function() {
-		optimalBuilding()
+document.getElementById('sectionRight').onclick = function () {
+	setTimeout(function () {
+		highlightBuilding()
 	}, 50)
 };
-setInterval(function() {
-   optimalBuilding();
+setInterval(function () {
+	highlightBuilding();
 }, 2000);
+highlightBuilding();
