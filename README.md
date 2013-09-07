@@ -1,4 +1,4 @@
-Cookie-Clicker-Optimum-Production
+Cookie-Clicker-Optimum-Production-Bookmarklet
 =================================
 
 Highlight best cookie-per-second/cost product for next buying
