@@ -1,9 +1,14 @@
-# What does it do?
 
-* The best product with maximum cookie-per-second/cost is highlighted in yellow.
-* If buying another product first can reduce total waiting time for best product, it will be highlighted in green.
 
-![Product Highlight Demo](http://i.imgur.com/m4HortR.png)
+# What does these color mean?
+![Product Highlight Demo](http://i.imgur.com/EsNPFZC.png)
+### Yellow product:
+The best product with maximum cookie-per-second/cost.
+
+A countdown will show up if your cookies is not enough to buy the best product.
+
+### Green product:
+Green product is not the best one, but buying it can help you buy yellow product faster.
 
 ## How do I use Cookie-Clicker-Highlighter?
 
@@ -21,3 +26,5 @@ javascript: (function() {
 ### 3. Click the bookmarklet on your Bookmarks Toolbar.
 
 ### That's all there is to it!
+
+
