@@ -4,7 +4,7 @@
 ```js
 javascript: (function() {
 	var e = document.createElement("script");
-	e.setAttribute("src", "http://jcppkkk.github.io/Cookie-Clicker-Highlighter/cookie-highlighter.js");
+	e.setAttribute("src", "//jcppkkk.github.io/Cookie-Clicker-Highlighter/cookie-highlighter.js");
 	document.getElementsByTagName("body")[0].appendChild(e)
 })();
 ```
