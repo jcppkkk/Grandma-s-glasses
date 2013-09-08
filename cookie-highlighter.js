@@ -1,13 +1,15 @@
+var myTimer;
+var updateTime = 1000;
 Number.prototype.toHHMMSS = function () {
-	var seconds = Math.floor(this),
+	var seconds = Math.ceil(this),
 		hours = Math.floor(seconds / 3600);
 	seconds -= hours * 3600;
 	var minutes = Math.floor(seconds / 60);
 	seconds -= minutes * 60;
 	var str = "";
-	if (hours) str = str + hours + 'h';
+	if (hours) str = str + hours + 'h ';
 	if (hours || minutes) str = str + minutes + 'm ';
-	if (hours || minutes || seconds) str = str + seconds + 's';
+	str = str + seconds + 's ';
 	return str;
 }
 var optBuilding = function (target, cookies, cookiesPs) {
@@ -63,6 +65,7 @@ var highlighter = function () {
 	});
 	var bestProductId = CP.indexOf(Math.max.apply(Math, CP));
 	var bestProduct = Game.ObjectsById[bestProductId];
+	var newTime = 1000;
 	timeDiv = document.getElementById('time');
 	if (timeDiv) {
 		timeDiv.parentElement.removeChild(timeDiv);
@@ -70,23 +73,31 @@ var highlighter = function () {
 	if (bestProduct.price > Game.cookies) {
 		opt = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
 		titleColor[opt.id] = "Lime";
-		optProd = document.querySelectorAll(".product")[opt.id];
-		optProd.innerHTML = optProd.innerHTML +
-			'<div id="time" style="position:absolute;top:3px;right:3px;color:yellow">' +
-			Number(opt.time).toHHMMSS() + '</div>';
+		var waitTime = Number(opt.time);
+		if (waitTime > 0 && waitTime != Number.MAX_VALUE) {
+			optProd = document.querySelectorAll(".product")[bestProductId];
+			optProd.innerHTML = optProd.innerHTML +
+				'<div id="time" style="position:absolute;top:3px;right:3px;color:yellow">' +
+				waitTime.toHHMMSS() + '</div>';
+			var shift = Math.abs((waitTime + 0.5) % 1 - 0.5);
+			if (waitTime < 1 || shift > 0.1) {
+				newTime = (waitTime * 1000) % 1000;
+			}
+		}
 	}
 	titleColor[bestProductId] = "yellow";
 	var titles = document.querySelectorAll(".product .title:first-child");
 	[].forEach.call(titles, function (title, id) {
 		title.style.color = titleColor[id];
 	});
+	if (updateTime != newTime) {
+		window.clearInterval(myTimer);
+		myTimer = window.setInterval(highlighter, newTime);
+		updateTime = newTime;
+	}
 };
 document.getElementById('sectionRight').onclick = function () {
-	setTimeout(function () {
-		highlighter()
-	}, 50)
+	setTimeout(highlighter, 50);
 };
-setInterval(function () {
-	highlighter();
-}, 999);
+myTimer = window.setInterval(highlighter, updateTime);
 highlighter();
