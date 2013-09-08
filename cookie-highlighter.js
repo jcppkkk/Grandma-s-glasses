@@ -28,7 +28,7 @@ var optBuilding = function (target, cookies, cookiesPs) {
 			/* This product is more expansive than target, exclude. */
 			stateAfterBought[i] = {
 				id: null,
-				time: Number.MAX_VALUE,
+				time: Infinity,
 				cookies: null,
 				cookiesPs: null
 			};
@@ -73,15 +73,15 @@ var updatePage = function () {
 	if (bestProduct.price > Game.cookies) {
 		optimal = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
 		titleColor[optimal.id] = "Lime";
-		var waitTime = Number((bestProduct.price - Game.cookies) / Game.cookiesPs);
-		if (waitTime > 0 && waitTime != Number.MAX_VALUE) {
+		var waitTime = (bestProduct.price - Game.cookies) / Game.cookiesPs;
+		if (waitTime > 0 && waitTime != Infinity) {
 			optProd = document.querySelectorAll(".product")[bestPid];
 			optProd.innerHTML = optProd.innerHTML +
 				'<div id="time" style="position:absolute;top:3px;right:3px;color:yellow">' +
-				waitTime.toHHMMSS() + '</div>';
-			var shift = Math.abs((waitTime + 0.5) % 1 - 0.5);
-			if (waitTime < 1 || shift > 0.1) {
-				newTime = (waitTime * 1000) % 1000;
+				Number(waitTime).toHHMMSS() + '</div>';
+			var shift = Math.abs((waitTime + 0.6) % 1 - 0.5);
+			if (shift > 0.1) {
+				newTime = ((waitTime + 0.1) % 1) * 1000;
 			}
 		}
 	}
