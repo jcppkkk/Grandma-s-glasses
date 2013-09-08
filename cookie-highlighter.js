@@ -25,7 +25,7 @@ var optBuilding = function (best, target, cookies, cookiesPs) {
 				cookiesPs: (cookiesPs + target.storedCps)
 			};
 		} else if (product.price > target.price || i == best.id) {
-			/* If product is more expansive than target, we must buy target. */
+			/* If product is more expansive, we will buy target before cookie. */
 			/* Caculating of buying best product is done in first call. */
 			stateAfterBought[i] = {
 				id: i,
