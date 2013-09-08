@@ -73,7 +73,7 @@ var updatePage = function () {
 	if (bestProduct.price > Game.cookies) {
 		optimal = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
 		titleColor[optimal.id] = "Lime";
-		var waitTime = Number(optimal.time);
+		var waitTime = Number((bestProduct.price - Game.cookies) / Game.cookiesPs);
 		if (waitTime > 0 && waitTime != Number.MAX_VALUE) {
 			optProd = document.querySelectorAll(".product")[bestPid];
 			optProd.innerHTML = optProd.innerHTML +
