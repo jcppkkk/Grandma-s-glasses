@@ -1,4 +1,16 @@
-var optimalBuilding = function (target, cookies, cookiesPs) {
+Number.prototype.toHHMMSS = function () {
+	var seconds = Math.floor(this),
+		hours = Math.floor(seconds / 3600);
+	seconds -= hours * 3600;
+	var minutes = Math.floor(seconds / 60);
+	seconds -= minutes * 60;
+	var str = "";
+	if (hours) str = str + hours + 'h';
+	if (hours || minutes) str = str + minutes + 'm ';
+	if (hours || minutes || seconds) str = str + seconds + 's';
+	return str;
+}
+var optBuilding = function (target, cookies, cookiesPs) {
 	var stateAfterBought = [];
 	for (var i = Game.ObjectsN; i--;) {
 		var product = Game.ObjectsById[i];
@@ -20,7 +32,7 @@ var optimalBuilding = function (target, cookies, cookiesPs) {
 			};
 		} else if (product.price > cookies) {
 			/* wait & buy some product(optimizable) then wait & buy target */
-			var afterBp = optimalBuilding(product, cookies, cookiesPs);
+			var afterBp = optBuilding(product, cookies, cookiesPs);
 			stateAfterBought[i] = {
 				id: afterBp.id,
 				time: afterBp.time + ((target.price - afterBp.cookies) / afterBp.cookiesPs),
@@ -43,7 +55,7 @@ var optimalBuilding = function (target, cookies, cookiesPs) {
 	var minTimeId = times.indexOf(Math.min.apply(Math, times));
 	return stateAfterBought[minTimeId];
 };
-var highlightBuilding = function () {
+var highlighter = function () {
 	var titleColor = [];
 	for (var i = Game.ObjectsN; i--; titleColor[i] = "") {}
 	var CP = Game.ObjectsById.map(function (product) {
@@ -51,22 +63,30 @@ var highlightBuilding = function () {
 	});
 	var bestProductId = CP.indexOf(Math.max.apply(Math, CP));
 	var bestProduct = Game.ObjectsById[bestProductId];
+	timeDiv = document.getElementById('time');
+	if (timeDiv) {
+		timeDiv.parentElement.removeChild(timeDiv);
+	}
 	if (bestProduct.price > Game.cookies) {
-		optimal = optimalBuilding(bestProduct, Game.cookies, Game.cookiesPs);
-		titleColor[optimal.id] = "Lime";
+		opt = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
+		titleColor[opt.id] = "Lime";
+		optProd = document.querySelectorAll(".product")[opt.id];
+		optProd.innerHTML = optProd.innerHTML +
+			'<div id="time" style="position:absolute;top:3px;right:3px;color:yellow">' +
+			Number(opt.time).toHHMMSS() + '</div>';
 	}
 	titleColor[bestProductId] = "yellow";
-	var titles = document.querySelectorAll(".content>.title:first-child");
+	var titles = document.querySelectorAll(".product .title:first-child");
 	[].forEach.call(titles, function (title, id) {
 		title.style.color = titleColor[id];
 	});
 };
 document.getElementById('sectionRight').onclick = function () {
 	setTimeout(function () {
-		highlightBuilding()
+		highlighter()
 	}, 50)
 };
 setInterval(function () {
-	highlightBuilding();
-}, 2000);
-highlightBuilding();
+	highlighter();
+}, 999);
+highlighter();
