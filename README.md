@@ -16,7 +16,7 @@ javascript: (function() {
 
 [4]. That's all there is to it!
 
-# What does these color mean?
+# What do these colors mean?
 ![Product Highlight Demo](http://i.imgur.com/EsNPFZC.png)
 ### Yellow product:
 The best product with maximum cookie-per-second/cost.
