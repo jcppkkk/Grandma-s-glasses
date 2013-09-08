@@ -1,13 +1,6 @@
-# What does it do?
+# How do I use Cookie-Clicker-Highlighter?
 
-* The best product with maximum cookie-per-second/cost is highlighted in yellow.
-* If buying another product first can reduce total waiting time for best product, it will be highlighted in green.
-
-![Product Highlight Demo](http://i.imgur.com/m4HortR.png)
-
-## How do I use Cookie-Clicker-Highlighter?
-
-### 1. Create a bookmark with following URL:
+1. Create a bookmark with following URL:
 ```js
 javascript: (function() {
 	var e = document.createElement("script");
@@ -16,8 +9,20 @@ javascript: (function() {
 })();
 ```
 
-### 2. Navigate to the [Cookie-Clicker](http://orteil.dashnet.org/cookieclicker/) page.
+2. Navigate to the [Cookie-Clicker](http://orteil.dashnet.org/cookieclicker/) page.
 
-### 3. Click the bookmarklet on your Bookmarks Toolbar.
+3. Click the bookmarklet on your Bookmarks Toolbar.
 
-### That's all there is to it!
+4. That's all there is to it!
+
+# What does these color mean?
+![Product Highlight Demo](http://i.imgur.com/EsNPFZC.png)
+### Yellow product:
+The best product with maximum cookie-per-second/cost.
+
+A countdown will show up if your cookies is not enough to buy the best product.
+
+### Green product:
+Green product is not the best one, but buying it can help you buy yellow product faster.
+
+
