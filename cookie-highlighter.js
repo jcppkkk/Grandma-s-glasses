@@ -57,25 +57,25 @@ var optBuilding = function (target, cookies, cookiesPs) {
 	var minTimeId = times.indexOf(Math.min.apply(Math, times));
 	return stateAfterBought[minTimeId];
 };
-var highlighter = function () {
+var updatePage = function () {
 	var titleColor = [];
 	for (var i = Game.ObjectsN; i--; titleColor[i] = "") {}
 	var CP = Game.ObjectsById.map(function (product) {
 		return (product.storedCps / product.price);
 	});
-	var bestProductId = CP.indexOf(Math.max.apply(Math, CP));
-	var bestProduct = Game.ObjectsById[bestProductId];
+	var bestPid = CP.indexOf(Math.max.apply(Math, CP));
+	var bestProduct = Game.ObjectsById[bestPid];
 	var newTime = 1000;
 	timeDiv = document.getElementById('time');
 	if (timeDiv) {
 		timeDiv.parentElement.removeChild(timeDiv);
 	}
 	if (bestProduct.price > Game.cookies) {
-		opt = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
-		titleColor[opt.id] = "Lime";
-		var waitTime = Number(opt.time);
+		optimal = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
+		titleColor[optimal.id] = "Lime";
+		var waitTime = Number(optimal.time);
 		if (waitTime > 0 && waitTime != Number.MAX_VALUE) {
-			optProd = document.querySelectorAll(".product")[bestProductId];
+			optProd = document.querySelectorAll(".product")[bestPid];
 			optProd.innerHTML = optProd.innerHTML +
 				'<div id="time" style="position:absolute;top:3px;right:3px;color:yellow">' +
 				waitTime.toHHMMSS() + '</div>';
@@ -85,19 +85,19 @@ var highlighter = function () {
 			}
 		}
 	}
-	titleColor[bestProductId] = "yellow";
+	titleColor[bestPid] = "yellow";
 	var titles = document.querySelectorAll(".product .title:first-child");
 	[].forEach.call(titles, function (title, id) {
 		title.style.color = titleColor[id];
 	});
 	if (updateTime != newTime) {
 		window.clearInterval(myTimer);
-		myTimer = window.setInterval(highlighter, newTime);
+		myTimer = window.setInterval(updatePage, newTime);
 		updateTime = newTime;
 	}
 };
 document.getElementById('sectionRight').onclick = function () {
-	setTimeout(highlighter, 50);
+	setTimeout(updatePage, 50);
 };
-myTimer = window.setInterval(highlighter, updateTime);
-highlighter();
+myTimer = window.setInterval(updatePage, updateTime);
+updatePage();
