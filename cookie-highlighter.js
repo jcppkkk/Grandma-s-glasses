@@ -12,29 +12,30 @@ Number.prototype.toHHMMSS = function () {
 	str = str + seconds + 's ';
 	return str;
 }
-var optBuilding = function (target, cookies, cookiesPs) {
+var optBuilding = function (best, target, cookies, cookiesPs) {
 	var stateAfterBought = [];
 	for (var i = Game.ObjectsN; i--;) {
 		var product = Game.ObjectsById[i];
 		if (i == target.id) {
-			/* Not buy any other product, just wait & buy target */
+			/* wait & buy target(it might be best product in first call) */
 			stateAfterBought[i] = {
 				id: i,
 				time: ((target.price - cookies) / cookiesPs),
 				cookies: 0,
 				cookiesPs: (cookiesPs + target.storedCps)
 			};
-		} else if (product.price > target.price) {
-			/* This product is more expansive than target, exclude. */
+		} else if (product.price > target.price || i == best.id) {
+			/* If product is more expansive than target, we must buy target. */
+			/* Caculating of buying best product is done in first call. */
 			stateAfterBought[i] = {
-				id: null,
+				id: i,
 				time: Infinity,
 				cookies: null,
 				cookiesPs: null
 			};
 		} else if (product.price > cookies) {
-			/* wait & buy some product(optimizable) then wait & buy target */
-			var afterBp = optBuilding(product, cookies, cookiesPs);
+			/* buy product with optimal time then buy target */
+			var afterBp = optBuilding(best, product, cookies, cookiesPs);
 			stateAfterBought[i] = {
 				id: afterBp.id,
 				time: afterBp.time + ((target.price - afterBp.cookies) / afterBp.cookiesPs),
@@ -42,7 +43,7 @@ var optBuilding = function (target, cookies, cookiesPs) {
 				cookiesPs: (afterBp.cookiesPs + target.storedCps)
 			};
 		} else {
-			/* buy some product then wait & buy target */
+			/* directly buy product then buy target */
 			stateAfterBought[i] = {
 				id: i,
 				time: ((target.price - (cookies - product.price)) / (cookiesPs + product.storedCps)),
@@ -64,16 +65,16 @@ var updatePage = function () {
 		return (product.storedCps / product.price);
 	});
 	var bestPid = CP.indexOf(Math.max.apply(Math, CP));
-	var bestProduct = Game.ObjectsById[bestPid];
+	var best = Game.ObjectsById[bestPid];
 	var newTime = 1000;
 	timeDiv = document.getElementById('time');
 	if (timeDiv) {
 		timeDiv.parentElement.removeChild(timeDiv);
 	}
-	if (bestProduct.price > Game.cookies) {
-		optimal = optBuilding(bestProduct, Game.cookies, Game.cookiesPs);
+	if (best.price > Game.cookies) {
+		optimal = optBuilding(best, best, Game.cookies, Game.cookiesPs);
 		titleColor[optimal.id] = "#22b14c";
-		var waitTime = (bestProduct.price - Game.cookies) / Game.cookiesPs;
+		var waitTime = (best.price - Game.cookies) / Game.cookiesPs;
 		if (waitTime > 0 && waitTime != Infinity) {
 			optProd = document.querySelectorAll(".product")[bestPid];
 			optProd.innerHTML = optProd.innerHTML +
