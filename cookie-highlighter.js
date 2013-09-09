@@ -50,7 +50,7 @@ hl.countdown = function (i) {
 		var shift = Math.abs((waitTime + 0.6) % 1 - 0.5);
 		if (waitTime < 1) {
 			newTime = waitTime * 1000;
-		} else if (shift > 0.1) {
+		} else if (shift > 0.05) {
 			newTime = ((waitTime + 0.1) % 1) * 1000;
 		}
 		if (hl.updateTime[i] != newTime) {
