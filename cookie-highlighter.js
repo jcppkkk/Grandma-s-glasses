@@ -4,7 +4,7 @@
 // 
 // Official Website -> http://bit.ly/CookieHighlighter
 // Reddit Thread 	-> http://bit.ly/1cZn8Eq
-// Version: v0.1.2
+// Version: v0.1.3
 //
 var hl = new Object();
 hl.init = function () {
@@ -29,9 +29,7 @@ hl.init_CountdownTimer = function () {
 };
 hl.updateTimer = function () {
 	for (var i = Game.ObjectsN; i--;) {
-		if (Game.ObjectsById[i].price > Game.cookies) {
-			hl.countdown(i);
-		}
+		hl.countdown(i);
 	}
 };
 hl.countdown = function (i) {
