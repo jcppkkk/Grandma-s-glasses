@@ -10,10 +10,10 @@ var hl = new Object();
 hl.init = function () {
 	hl.init_CountdownTimer();
 	hl.updateTimer();
-	hl.updateBuilding();
+	//hl.updateBuilding();
 	document.getElementById('sectionRight').onclick = function () {
 		setTimeout(hl.updateTimer, 50);
-		setTimeout(hl.updateBuilding, 50);
+		//setTimeout(hl.updateBuilding, 50);
 	};
 };
 /* Multi countdown timer */
