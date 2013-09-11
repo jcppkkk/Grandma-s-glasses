@@ -7,6 +7,7 @@
 //
 // Versions
 //		v.1.035.04 : fix timers
+//		v.1.035.05 : better timer CSS
 //
 var hl = new Object();
 hl.init = function () {
@@ -15,7 +16,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.035.04"
+		version.textContent = "Highlighter v.1.035.05"
 		document.getElementById("storeTitle").appendChild(version);
 	}
 	/* init CountdownTimer */
