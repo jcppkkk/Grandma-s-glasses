@@ -5,20 +5,8 @@
 // Official Website -> http://bit.ly/CookieHighlighter
 // Reddit Thread 	-> http://bit.ly/1cZn8Eq
 //
-// Versions
-//		v.1.035.04 : fix timers
-//		v.1.035.05 : better timer CSS
-//
 var hl = new Object();
 hl.init = function () {
-	var version = document.getElementById("HighlighterVersion");
-	if (!version) {
-		var version = document.createElement("div");
-		version.className = "HighlighterVersion";
-		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.035.05"
-		document.getElementById("storeTitle").appendChild(version);
-	}
 	/* init CountdownTimer */
 	var css = document.createElement("style");
 	css.type = "text/css";
@@ -55,6 +43,15 @@ hl.init = function () {
 			}
 		}, 50);
 	};
+	var version = document.getElementById("HighlighterVersion");
+	if (!version) {
+		var version = document.createElement("div");
+		version.className = "HighlighterVersion";
+		version.id = "HighlighterVersion";
+		version.textContent = "Highlighter v.1.035.05"
+		document.getElementById("storeTitle").appendChild(version);
+	}
+	Game.particlesAdd("Highlighter v.1.035.05 Loaded!")
 };
 hl.timer = function (i, loop) {
 	var id = "timer" + i;
