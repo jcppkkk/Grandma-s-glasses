@@ -14,49 +14,43 @@ hl.init = function () {
 	css.innerHTML = ".timer { position:absolute;top:3px;right:3px;color:yellow }";
 	document.body.appendChild(css);
 	for (var i = Game.ObjectsN; i--;) {
-		new hl.timer(i);
+		hl.timer(i, "loop");
 	}
 	/* init Optimal Building */
-	/*hl.updateBuilding();
+	//hl.updateBuilding();
 	document.getElementById('sectionRight').onclick = function () {
-		setTimeout(hl.updateBuilding, 50);
-	};*/
-};
-hl.timer = function (i) {
-	this.id = "timer" + i;
-	this.product = Game.ObjectsById[i];
-
-	function internalCallback() {
-		var updateTime = 1000;
-		var timeDiv = document.getElementById(this.id);
-		if (!timeDiv) {
-			var timeDiv = document.createElement('div');
-			timeDiv.className = "timer";
-			timeDiv.id = this.id;
-			document.getElementById("product" + i).appendChild(css);
+		//setTimeout(hl.updateBuilding, 50);
+		for (var i = Game.ObjectsN; i--;) {
+			hl.timer(i);
 		}
-		if (this.product.price > Game.cookies) {
-			var newTime = 1000;
-			var waitTime = (this.product.price - Game.cookies) / Game.cookiesPs;
-			timeDiv.textContent = Number(waitTime).toHHMMSS();
-			var shift = Math.abs((waitTime + 0.6) % 1 - 0.5);
-			if (waitTime < 1) {
-				newTime = waitTime * 1000;
-			} else if (shift > 0.05) {
-				newTime = ((waitTime + 0.1) % 1) * 1000;
-			}
-			if (this.updateTime != newTime) {
-				window.clearInterval([i]);
-				[i] = window.setInterval(function () {
-					hl.timer(i);
-				}, newTime);
-				this.updateTime = newTime;
-			}
-		} else {
-			timeDiv.textContent = " ";
-		}
-		window.setTimeout(internalCallback, updateTime);
 	};
+};
+hl.timer = function (i, loop) {
+	var id = "timer" + i;
+	/* update timer text */
+	var timeDiv = document.getElementById(id);
+	if (!timeDiv) {
+		var timeDiv = document.createElement('div');
+		timeDiv.className = "timer";
+		timeDiv.id = id;
+		document.getElementById("product" + i).appendChild(timeDiv);
+	}
+	var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
+	timeDiv.textContent = Number(waitTime).toHHMMSS();
+	/* adjust timer if waitTime not in x.95±0.05 */
+	if (loop == "loop") {
+		console.log(id);
+		var newTime;
+		if (timeDiv.textContent != " ") {
+			var shift = Math.abs((waitTime + 0.55) % 1 - 0.5);
+			if (shift > 0.05) {
+				newTime = ((waitTime + 0.05) % 1);
+			}
+		}
+		window.setTimeout(function () {
+			hl.timer(i, "loop");
+		}, newTime ? (newTime * 1000) : 1000);
+	}
 };
 /* Optimal Buiding Highlighter */
 hl.updateBuilding = function () {
@@ -125,6 +119,7 @@ hl.optimalBuilding = function (best, target, cookies, cookiesPs) {
 };
 /* External Libraries */
 Number.prototype.toHHMMSS = function () {
+	if (this <= 0 || isNaN(this) || this == Infinity) return " ";
 	var seconds = Math.ceil(this),
 		hours = Math.floor(seconds / 3600);
 	seconds -= hours * 3600;
