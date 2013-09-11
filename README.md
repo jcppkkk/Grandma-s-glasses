@@ -5,7 +5,7 @@
 ```js
 javascript: (function() {
 	var e = document.createElement("script");
-	e.setAttribute("src", "//jcppkkk.github.io/Cookie-Clicker-Highlighter/cookie-highlighter.js");
+	e.setAttribute("src", "//raw.github.com/jcppkkk/Cookie-Clicker-Highlighter/master/cookie-highlighter.js");
 	document.getElementsByTagName("body")[0].appendChild(e)
 })();
 ```
@@ -33,5 +33,3 @@ javascript: (function() {
 ![](http://i.imgur.com/N8Y5UlZ.png)
 
 `Green product` is not the best one, but buying it can help you buy yellow product faster.
-
-<a id="codeOut" href='javascript:(function(){javascript:(function(){var e=document.createElement("script");e.setAttribute("src","//jcppkkk.github.io/Cookie-Clicker-Highlighter/cookie-highlighter.js");document.getElementsByTagName("body")[0].appendChild(e)})();})();'>Test Bookmarklet</a>
