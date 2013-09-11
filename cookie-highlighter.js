@@ -39,7 +39,6 @@ hl.timer = function (i, loop) {
 	timeDiv.textContent = Number(waitTime).toHHMMSS();
 	/* adjust timer if waitTime not in x.95±0.05 */
 	if (loop == "loop") {
-		console.log(id);
 		var newTime;
 		if (timeDiv.textContent != " ") {
 			var shift = Math.abs((waitTime + 0.55) % 1 - 0.5);
