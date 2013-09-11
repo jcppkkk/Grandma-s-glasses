@@ -23,7 +23,7 @@ hl.init = function () {
 	css.type = "text/css";
 	css.innerHTML =
 		".timer { position:absolute;top:3px;right:3px;color:yellow;font-size:10px;}\
-		.HighlighterVersion { position:absolute;bottom:3px;sectionRight:3px;font-size:12px; }";
+		.HighlighterVersion { position:absolute;bottom:3px;right:3px;font-size:12px; }";
 	document.body.appendChild(css);
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
