@@ -25,11 +25,11 @@ hl.init = function () {
 	css.innerHTML =
 		".timer {\
 			position: relative;\
-			float: right;\
+			float: left;\
 			color: yellow;\
 			font-size: 10px;\
-			top: 6px;\
-			right: 2px;\
+			top: 1px;\
+			left: 2px;\
 			z-index: 1000;\
 			font-weight: bold;\
 			text-shadow: 1px 1px 1px #000,0px 1px 0px #000!important;\
