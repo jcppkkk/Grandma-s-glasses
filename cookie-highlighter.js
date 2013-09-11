@@ -5,14 +5,25 @@
 // Official Website -> http://bit.ly/CookieHighlighter
 // Reddit Thread 	-> http://bit.ly/1cZn8Eq
 //
-// Version: v0.1.4 : fix timers
+// Versions
+//		v0.1.4 : fix timers
 //
 var hl = new Object();
 hl.init = function () {
+	var version = document.getElementById("HighlighterVersion");
+	if (!version) {
+		var version = document.createElement("div");
+		version.className = "HighlighterVersion";
+		version.id = "HighlighterVersion";
+		version.textContent = "Highlighter v0.1.4"
+		document.getElementById("storeTitle").appendChild(version);
+	}
 	/* init CountdownTimer */
 	var css = document.createElement("style");
 	css.type = "text/css";
-	css.innerHTML = ".timer { position:absolute;top:3px;right:3px;color:yellow }";
+	css.innerHTML =
+		".timer { position:absolute;top:3px;right:3px;color:yellow;font-size:10px;}\
+		.HighlighterVersion { position:absolute;bottom:3px;right:3px;font-size:12px; }";
 	document.body.appendChild(css);
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
@@ -21,9 +32,11 @@ hl.init = function () {
 	//hl.updateBuilding();
 	document.getElementById('sectionRight').onclick = function () {
 		//setTimeout(hl.updateBuilding, 50);
-		for (var i = Game.ObjectsN; i--;) {
-			hl.timer(i);
-		}
+		setTimeout(function () {
+			for (var i = Game.ObjectsN; i--;) {
+				hl.timer(i);
+			}
+		}, 50);
 	};
 };
 hl.timer = function (i, loop) {
