@@ -39,6 +39,7 @@ hl.init = function () {
 			bottom: 3px;\
 			right: 3px;\
 			font-size: 12px;\
+			text-shadow: 0px 0px 4px #000,0px 1px 0px #000!important;\
 		}";
 	document.body.appendChild(css);
 	for (var i = Game.ObjectsN; i--;) {
