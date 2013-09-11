@@ -6,7 +6,7 @@
 // Reddit Thread 	-> http://bit.ly/1cZn8Eq
 //
 // Versions
-//		v0.1.4 : fix timers
+//		v.1.035.04 : fix timers
 //
 var hl = new Object();
 hl.init = function () {
@@ -15,7 +15,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v0.1.4"
+		version.textContent = "Highlighter v.1.035.04"
 		document.getElementById("storeTitle").appendChild(version);
 	}
 	/* init CountdownTimer */
@@ -23,7 +23,7 @@ hl.init = function () {
 	css.type = "text/css";
 	css.innerHTML =
 		".timer { position:absolute;top:3px;right:3px;color:yellow;font-size:10px;}\
-		.HighlighterVersion { position:absolute;bottom:3px;right:3px;font-size:12px; }";
+		.HighlighterVersion { position:absolute;bottom:3px;sectionRight:3px;font-size:12px; }";
 	document.body.appendChild(css);
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
