@@ -8,58 +8,48 @@
 //
 var hl = new Object();
 hl.init = function () {
-	hl.init_CountdownTimer();
-	hl.updateTimer();
-	//hl.updateBuilding();
-	document.getElementById('sectionRight').onclick = function () {
-		setTimeout(hl.updateTimer, 50);
-		//setTimeout(hl.updateBuilding, 50);
-	};
-};
-/* Multi countdown timer */
-hl.init_CountdownTimer = function () {
-	// Timer style
+	/* init CountdownTimer */
 	var css = document.createElement("style");
 	css.type = "text/css";
 	css.innerHTML = ".timer { position:absolute;top:3px;right:3px;color:yellow }";
 	document.body.appendChild(css);
-	hl.timer = [];
-	hl.updateTime = [];
-	for (var i = Game.ObjectsN; i--; hl.updateTime[i] = 1000) {}
-};
-hl.updateTimer = function () {
 	for (var i = Game.ObjectsN; i--;) {
-		hl.countdown(i);
+		hl.timer(i, "loop");
 	}
+	/* init Optimal Building */
+	//hl.updateBuilding();
+	document.getElementById('sectionRight').onclick = function () {
+		//setTimeout(hl.updateBuilding, 50);
+		for (var i = Game.ObjectsN; i--;) {
+			hl.timer(i);
+		}
+	};
 };
-hl.countdown = function (i) {
+hl.timer = function (i, loop) {
 	var id = "timer" + i;
+	/* update timer text */
 	var timeDiv = document.getElementById(id);
 	if (!timeDiv) {
-		var str = '<div id="' + id + '" class="timer"> </div>';
-		var pdiv = document.getElementById("product" + i);
-		pdiv.innerHTML = pdiv.innerHTML + str;
-		timeDiv = document.getElementById(id);
+		var timeDiv = document.createElement('div');
+		timeDiv.className = "timer";
+		timeDiv.id = id;
+		document.getElementById("product" + i).appendChild(timeDiv);
 	}
-	if (Game.ObjectsById[i].price > Game.cookies) {
-		var newTime = 1000;
-		var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
-		timeDiv.textContent = Number(waitTime).toHHMMSS();
-		var shift = Math.abs((waitTime + 0.6) % 1 - 0.5);
-		if (waitTime < 1) {
-			newTime = waitTime * 1000;
-		} else if (shift > 0.05) {
-			newTime = ((waitTime + 0.1) % 1) * 1000;
+	var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
+	timeDiv.textContent = Number(waitTime).toHHMMSS();
+	/* adjust timer if waitTime not in x.95±0.05 */
+	if (loop == "loop") {
+		console.log(id);
+		var newTime;
+		if (timeDiv.textContent != " ") {
+			var shift = Math.abs((waitTime + 0.55) % 1 - 0.5);
+			if (shift > 0.05) {
+				newTime = ((waitTime + 0.05) % 1);
+			}
 		}
-		if (hl.updateTime[i] != newTime) {
-			window.clearInterval(hl.timer[i]);
-			hl.timer[i] = window.setInterval(function () {
-				hl.countdown(i);
-			}, newTime);
-			hl.updateTime[i] = newTime;
-		}
-	} else {
-		timeDiv.textContent = " ";
+		window.setTimeout(function () {
+			hl.timer(i, "loop");
+		}, newTime ? (newTime * 1000) : 1000);
 	}
 };
 /* Optimal Buiding Highlighter */
@@ -129,6 +119,7 @@ hl.optimalBuilding = function (best, target, cookies, cookiesPs) {
 };
 /* External Libraries */
 Number.prototype.toHHMMSS = function () {
+	if (this <= 0 || isNaN(this) || this == Infinity) return " ";
 	var seconds = Math.ceil(this),
 		hours = Math.floor(seconds / 3600);
 	seconds -= hours * 3600;
