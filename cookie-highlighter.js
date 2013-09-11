@@ -4,7 +4,8 @@
 // 
 // Official Website -> http://bit.ly/CookieHighlighter
 // Reddit Thread 	-> http://bit.ly/1cZn8Eq
-// Version: v0.1.3
+//
+// Version: v0.1.4 : fix timers
 //
 var hl = new Object();
 hl.init = function () {
