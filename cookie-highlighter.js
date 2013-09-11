@@ -8,59 +8,55 @@
 //
 var hl = new Object();
 hl.init = function () {
-	hl.init_CountdownTimer();
-	hl.updateTimer();
-	//hl.updateBuilding();
-	document.getElementById('sectionRight').onclick = function () {
-		setTimeout(hl.updateTimer, 50);
-		//setTimeout(hl.updateBuilding, 50);
-	};
-};
-/* Multi countdown timer */
-hl.init_CountdownTimer = function () {
-	// Timer style
+	/* init CountdownTimer */
 	var css = document.createElement("style");
 	css.type = "text/css";
 	css.innerHTML = ".timer { position:absolute;top:3px;right:3px;color:yellow }";
 	document.body.appendChild(css);
-	hl.timer = [];
-	hl.updateTime = [];
-	for (var i = Game.ObjectsN; i--; hl.updateTime[i] = 1000) {}
-};
-hl.updateTimer = function () {
 	for (var i = Game.ObjectsN; i--;) {
-		hl.countdown(i);
+		new hl.timer(i);
 	}
+	/* init Optimal Building */
+	/*hl.updateBuilding();
+	document.getElementById('sectionRight').onclick = function () {
+		setTimeout(hl.updateBuilding, 50);
+	};*/
 };
-hl.countdown = function (i) {
-	var id = "timer" + i;
-	var timeDiv = document.getElementById(id);
-	if (!timeDiv) {
-		var str = '<div id="' + id + '" class="timer"> </div>';
-		var pdiv = document.getElementById("product" + i);
-		pdiv.innerHTML = pdiv.innerHTML + str;
-		timeDiv = document.getElementById(id);
-	}
-	if (Game.ObjectsById[i].price > Game.cookies) {
-		var newTime = 1000;
-		var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
-		timeDiv.textContent = Number(waitTime).toHHMMSS();
-		var shift = Math.abs((waitTime + 0.6) % 1 - 0.5);
-		if (waitTime < 1) {
-			newTime = waitTime * 1000;
-		} else if (shift > 0.05) {
-			newTime = ((waitTime + 0.1) % 1) * 1000;
+hl.timer = function (i) {
+	this.id = "timer" + i;
+	this.product = Game.ObjectsById[i];
+
+	function internalCallback() {
+		var updateTime = 1000;
+		var timeDiv = document.getElementById(this.id);
+		if (!timeDiv) {
+			var timeDiv = document.createElement('div');
+			timeDiv.className = "timer";
+			timeDiv.id = this.id;
+			document.getElementById("product" + i).appendChild(css);
 		}
-		if (hl.updateTime[i] != newTime) {
-			window.clearInterval(hl.timer[i]);
-			hl.timer[i] = window.setInterval(function () {
-				hl.countdown(i);
-			}, newTime);
-			hl.updateTime[i] = newTime;
+		if (this.product.price > Game.cookies) {
+			var newTime = 1000;
+			var waitTime = (this.product.price - Game.cookies) / Game.cookiesPs;
+			timeDiv.textContent = Number(waitTime).toHHMMSS();
+			var shift = Math.abs((waitTime + 0.6) % 1 - 0.5);
+			if (waitTime < 1) {
+				newTime = waitTime * 1000;
+			} else if (shift > 0.05) {
+				newTime = ((waitTime + 0.1) % 1) * 1000;
+			}
+			if (this.updateTime != newTime) {
+				window.clearInterval([i]);
+				[i] = window.setInterval(function () {
+					hl.timer(i);
+				}, newTime);
+				this.updateTime = newTime;
+			}
+		} else {
+			timeDiv.textContent = " ";
 		}
-	} else {
-		timeDiv.textContent = " ";
-	}
+		window.setTimeout(internalCallback, updateTime);
+	};
 };
 /* Optimal Buiding Highlighter */
 hl.updateBuilding = function () {
