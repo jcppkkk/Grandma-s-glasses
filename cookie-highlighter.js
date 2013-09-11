@@ -22,8 +22,23 @@ hl.init = function () {
 	var css = document.createElement("style");
 	css.type = "text/css";
 	css.innerHTML =
-		".timer { position:absolute;top:3px;right:3px;color:yellow;font-size:10px;}\
-		.HighlighterVersion { position:absolute;bottom:3px;right:3px;font-size:12px; }";
+		".timer {\
+			position: relative;\
+			float: right;\
+			color: yellow;\
+			font-size: 10px;\
+			top: 6px;\
+			right: 2px;\
+			z-index: 1000;\
+			font-weight: bold;\
+			text-shadow: 1px 1px 1px #000,0px 1px 0px #000!important;\
+		}\
+		.HighlighterVersion {\
+			position: absolute;\
+			bottom: 3px;\
+			right: 3px;\
+			font-size: 12px;\
+		}";
 	document.body.appendChild(css);
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
@@ -47,7 +62,8 @@ hl.timer = function (i, loop) {
 		var timeDiv = document.createElement('div');
 		timeDiv.className = "timer";
 		timeDiv.id = id;
-		document.getElementById("product" + i).appendChild(timeDiv);
+		var p = document.getElementById("product" + i)
+		p.parentNode.insertBefore(timeDiv, p);
 	}
 	var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
 	timeDiv.textContent = Number(waitTime).toHHMMSS();
