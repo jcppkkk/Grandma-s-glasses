@@ -15,9 +15,7 @@ hl.init = function () {
 			position: relative;\
 			float: left;\
 			color: yellow;\
-			font-size: 10px;\
-			top: 1px;\
-			left: 2px;\
+			font-size: 12px;\
 			z-index: 1000;\
 			font-weight: bold;\
 			text-shadow: 1px 1px 1px #000,0px 1px 0px #000!important;\
