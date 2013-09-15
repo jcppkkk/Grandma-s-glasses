@@ -126,9 +126,12 @@ hl.markBuilding = function () {
 			if (b2Pid == bestPid || b2.price >= best.price) continue;
 			var result = hl.buyingTime([b2, best], baseCookies);
 			if (result.waitTime < bestResult.waitTime) bestResult = result;
+		}
+		if (bestResult.chain.length == 2 && bestResult.chain[0].price > baseCookies) {
+			b2 = bestResult.chain[0];
 			for (var b1Pid = Game.ObjectsN; b1Pid--;) {
 				var b1 = Game.ObjectsById[b1Pid];
-				if (b1Pid == bestPid || b1.price > b2.price || b1.price > baseCookies)
+				if (b1Pid == bestPid || b1.price > b2.price)
 					continue;
 				var result = hl.buyingTime([b1, b2, best], baseCookies);
 				if (result.waitTime < bestResult.waitTime) bestResult = result;
@@ -183,9 +186,9 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036"
+		version.textContent = "Highlighter v.1.036.01"
 		l("storeTitle").appendChild(version);
 	}
-	Game.particlesAdd(version.textContent+" Loaded!");
+	Game.particlesAdd(version.textContent + " Loaded!");
 };
 hl.init();
