@@ -164,7 +164,7 @@ hl.init = function () {
 		}\
 		.HighlighterVersion {\
 			position: absolute;\
-			bottom: 3px;\
+			top: 3px;\
 			right: 3px;\
 			font-size: 12px;\
 			text-shadow: 0px 0px 4px #000,0px 1px 0px #000!important;\
@@ -186,7 +186,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.01"
+		version.textContent = "Highlighter v.1.036.02"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
