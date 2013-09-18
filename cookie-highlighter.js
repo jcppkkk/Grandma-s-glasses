@@ -146,9 +146,7 @@ hl.markBuilding = function () {
 			}), chains[i].time);
 		};*/
 		var best = chains[0];
-		best.chain.reverse();
-		if (best.chain[2]) titleColor[best.chain[2].id] = "#2CDB5F";
-		else if (best.chain[1]) titleColor[best.chain[1].id] = "#22b14c";
+		titleColor[best.chain[0].id] = "#22b14c";
 	}
 	titleColor[targetPid] = "yellow";
 	var titles = document.querySelectorAll(".product .title:first-child");
@@ -194,7 +192,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.05"
+		version.textContent = "Highlighter v.1.036.06"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
