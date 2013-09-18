@@ -30,7 +30,7 @@ Number.prototype.toTimeString = function () {
 if (!hl) {
 	var hl = {};
 }
-hl.timer = function (i, loop) {
+hl.timer = function (i, loop, cookieClicks) {
 	var id = "timer" + i;
 	/* update timer text */
 	var timeDiv = l(id);
@@ -56,8 +56,12 @@ hl.timer = function (i, loop) {
 				newTime = ((waitTime + 0.05) % 1);
 			}
 		}
+		if (Game.cookieClicks != cookieClicks) {
+			newTime = 0.25;
+			cookieClicks = Game.cookieClicks;
+		}
 		window.setTimeout(function () {
-			hl.timer(i, "loop");
+			hl.timer(i, "loop", cookieClicks);
 		}, newTime ? (newTime * 1000) : 1000);
 	}
 };
@@ -144,7 +148,7 @@ hl.markBuilding = function () {
 		var best = chains[0];
 		best.chain.reverse();
 		if (best.chain[2]) titleColor[best.chain[2].id] = "#2CDB5F";
-		if (best.chain[1]) titleColor[best.chain[1].id] = "#22b14c";
+		else if (best.chain[1]) titleColor[best.chain[1].id] = "#22b14c";
 	}
 	titleColor[targetPid] = "yellow";
 	var titles = document.querySelectorAll(".product .title:first-child");
@@ -190,7 +194,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.03"
+		version.textContent = "Highlighter v.1.036.04"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
