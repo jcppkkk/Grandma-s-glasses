@@ -76,36 +76,28 @@ hl.ifbuy = function (me, callback) {
 	var price = me.price;
 	me.amount++;
 	me.price = me.basePrice * Math.pow(Game.priceIncrease, me.amount);
-	var result = callback();
+	var ret = callback();
 	me.amount--;
 	me.price = price;
 	me.buy = buy;
-	return result;
-}
+	return ret;
+};
 hl.buyingTime = function (chain, baseCookies) {
-	if (!chain[0]) return {
-		waitTime: 0,
-		chain: chain
-	};
+	if (chain.length == 0) return 0;
 	var first = chain[0];
-	if (first.price <= baseCookies) {
+	var price = first.price;
+	if (price <= baseCookies) {
 		return hl.ifbuy(first, function () {
-			return {
-				waitTime: hl.buyingTime(chain.slice(1), baseCookies - first.price).waitTime,
-				chain: chain
-			};
+			return hl.buyingTime(chain.slice(1), baseCookies - price)
 		});
 	} else {
-		var time = (first.price - baseCookies) / hl.CalculateGains();
+		var waitTime = (price - baseCookies) / hl.CalculateGains();
 		return hl.ifbuy(first, function () {
-			return {
-				waitTime: time + hl.buyingTime(chain.slice(1), 0).waitTime,
-				chain: chain
-			};
+			return waitTime + hl.buyingTime(chain.slice(1), 0)
 		});
 	}
 	throw ("Unhandled buyingTime case.");
-}
+};
 hl.markBuilding = function () {
 	var titleColor = [];
 	for (var i = Game.ObjectsN; i--; titleColor[i] = "") {}
@@ -117,32 +109,44 @@ hl.markBuilding = function () {
 		});
 		return GainedCookiesPs / me.price;
 	});
-	var bestPid = CP.indexOf(Math.max.apply(Math, CP));
-	var best = Game.ObjectsById[bestPid];
-	if (best.price > baseCookies) {
-		var bestResult = hl.buyingTime([best], baseCookies);
+	var targetPid = CP.indexOf(Math.max.apply(Math, CP));
+	var target = Game.ObjectsById[targetPid];
+	var chains = [];
+	if (target.price > baseCookies) {
+		chains.push({
+			chain: [target],
+			time: hl.buyingTime([target], baseCookies)
+		});
 		for (var b2Pid = Game.ObjectsN; b2Pid--;) {
 			var b2 = Game.ObjectsById[b2Pid];
-			if (b2Pid == bestPid || b2.price >= best.price) continue;
-			var result = hl.buyingTime([b2, best], baseCookies);
-			if (result.waitTime < bestResult.waitTime) bestResult = result;
-		}
-		if (bestResult.chain.length == 2 && bestResult.chain[0].price > baseCookies) {
-			b2 = bestResult.chain[0];
+			if (b2Pid == targetPid || b2.price >= target.price) continue;
+			chains.push({
+				chain: [b2, target],
+				time: hl.buyingTime([b2, target], baseCookies)
+			});
 			for (var b1Pid = Game.ObjectsN; b1Pid--;) {
 				var b1 = Game.ObjectsById[b1Pid];
-				if (b1Pid == bestPid || b1.price > b2.price)
-					continue;
-				var result = hl.buyingTime([b1, b2, best], baseCookies);
-				if (result.waitTime < bestResult.waitTime) bestResult = result;
+				if (b1Pid == targetPid || b1.price >= target.price) continue;
+				chains.push({
+					chain: [b1, b2, target],
+					time: hl.buyingTime([b1, b2, target], baseCookies)
+				});
 			}
 		}
-		bestResult.chain.reverse();
-		var chain = bestResult.chain;
-		if (chain[2]) titleColor[chain[2].id] = "#2CDB5F";
-		if (chain[1]) titleColor[chain[1].id] = "#22b14c";
+		chains.sort(function (a, b) {
+			return a.time - b.time
+		})
+		/*for (var i = chains.length - 1; i >= 0; i--) {
+			console.log(i, chains[i].chain.map(function (me) {
+				return me.id;
+			}), chains[i].time);
+		};*/
+		var best = chains[0];
+		best.chain.reverse();
+		if (best.chain[2]) titleColor[best.chain[2].id] = "#2CDB5F";
+		if (best.chain[1]) titleColor[best.chain[1].id] = "#22b14c";
 	}
-	titleColor[bestPid] = "yellow";
+	titleColor[targetPid] = "yellow";
 	var titles = document.querySelectorAll(".product .title:first-child");
 	[].forEach.call(titles, function (title, id) {
 		title.style.color = titleColor[id];
@@ -176,7 +180,7 @@ hl.init = function () {
 			hl.markBuilding();
 		}, 100);
 	};
-	setInterval(hl.markBuilding, 2000);
+	//setInterval(hl.markBuilding, 2000);
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
 	}
@@ -186,7 +190,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.02"
+		version.textContent = "Highlighter v.1.036.03"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
