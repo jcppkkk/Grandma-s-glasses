@@ -184,7 +184,7 @@ hl.init = function () {
 			hl.markBuilding();
 		}, 100);
 	};
-	//setInterval(hl.markBuilding, 2000);
+	setInterval(hl.markBuilding, 1000);
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
 	}
@@ -194,7 +194,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.04"
+		version.textContent = "Highlighter v.1.036.05"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
