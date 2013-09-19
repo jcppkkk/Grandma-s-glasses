@@ -54,12 +54,11 @@ hl.timer = function (i, loop, cookieClicks) {
 			var shift = Math.abs((waitTime + 0.55) % 1 - 0.5);
 			if (shift > 0.05) {
 				newTime = ((waitTime + 0.05) % 1);
+			} else if (cookieClicks != Game.cookieClicks) {
+				newTime = 0.25;
 			}
 		}
-		if (Game.cookieClicks != cookieClicks) {
-			newTime = 0.25;
-			cookieClicks = Game.cookieClicks;
-		}
+		cookieClicks = Game.cookieClicks;
 		window.setTimeout(function () {
 			hl.timer(i, "loop", cookieClicks);
 		}, newTime ? (newTime * 1000) : 1000);
@@ -192,7 +191,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "HighlighterVersion";
 		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.06"
+		version.textContent = "Highlighter v.1.036.07"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
