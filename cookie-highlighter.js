@@ -129,12 +129,11 @@ hl.highlight = function () {
 		}
 	};
 	/* 3-level optimize */
-	hl.chains = [];
+	hl.chains = [{
+		chain: [target],
+		time: hl.buyingTime([target], baseCookies)
+	}];
 	if (target.price > baseCookies) {
-		hl.chains.push({
-			chain: [target],
-			time: hl.buyingTime([target], baseCookies)
-		});
 		for (var b2Id = Game.ObjectsById.length - 1; b2Id >= 0; b2Id--) {
 			var b2 = Game.ObjectsById[b2Id];
 			if (b2 === target || b2.price >= target.price) continue;
@@ -229,7 +228,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "GrandmaGlassesVersion";
 		version.id = "GrandmaGlassesVersion";
-		version.textContent = "Grandma's Glasses v.1.036.09"
+		version.textContent = "Grandma's Glasses v.1.036.10";
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
