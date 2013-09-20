@@ -144,7 +144,7 @@ hl.highlight = function () {
 			});
 			for (var b1Id = Game.ObjectsById.length - 1; b1Id >= 0; b1Id--) {
 				var b1 = Game.ObjectsById[b1Id];
-				if (b1 === target || b1.price >= target.price) continue;
+				if (b1 === target || b1.price > baseCookies) continue;
 				if (b1 === b2 && b1 instanceof Game.Upgrade) continue;
 				hl.chains.push({
 					chain: [b1, b2, target],
@@ -163,8 +163,11 @@ hl.highlight = function () {
 		}), hl.chains[i].time);
 	};
 	*/
-	if (hl.chains.length > 0) hl.chains[0].chain[0].color = "#22b14c";
-	target.color = "yellow";
+	bestChain = hl.chains[0].chain;
+	bestChain.reverse();
+	if (bestChain[2]) bestChain[2].color = "#2CE663";
+	if (bestChain[1]) bestChain[1].color = "#22b14c";
+	bestChain[0].color = "yellow";
 	/* Update highlight color*/
 	var itemTitles = document.querySelectorAll(".product .title:first-child");
 	[].forEach.call(itemTitles, function (title, id) {
@@ -228,7 +231,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "GrandmaGlassesVersion";
 		version.id = "GrandmaGlassesVersion";
-		version.textContent = "Grandma's Glasses v.1.036.08"
+		version.textContent = "Grandma's Glasses v.1.036.09"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
