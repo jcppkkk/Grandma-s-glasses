@@ -1,9 +1,9 @@
-// Cookie-Clicker-Highlighter
+// Grandma's Glasses
 //
-//	"Baking better cookies in a more efficient way.""
+//     "Get universal omniscient by seeing through grandma's glasses."
 // 
-// Official Website -> http://bit.ly/CookieHighlighter
-// Reddit Thread 	-> http://bit.ly/1cZn8Eq
+// Official Website -> http://scyu.logdown.com/posts/2013/09/12/grandma-s-glasses
+// Reddit Thread 	-> http://redd.it/1mkwx8
 //
 /* External Libraries */
 if (!l) {
@@ -45,7 +45,7 @@ hl.timer = function (i, loop, cookieClicks) {
 	var oldText = timeDiv.textContent;
 	timeDiv.textContent = Number(waitTime).toTimeString();
 	if (oldText != " " && timeDiv.textContent == " ") {
-		hl.markBuilding();
+		hl.highlight();
 	}
 	/* adjust timer if waitTime not in x.95±0.05 */
 	if (loop == "loop") {
@@ -64,94 +64,122 @@ hl.timer = function (i, loop, cookieClicks) {
 		}, newTime ? (newTime * 1000) : 1000);
 	}
 };
-hl.CalculateGains = function () {
-	var cookiesPs = 0;
-	for (var i = Game.ObjectsN; i--;) {
-		var me = Game.ObjectsById[i];
-		var storedTotalCps = me.amount * me.cps();
-		cookiesPs += storedTotalCps;
+hl.cpsString = Game.CalculateGains.toString().replace(
+	/Game\.(cookiesPs|Win|computedMouseCps)/g, "hl.$1").replace(
+	/for.*cpsAchievs.*\)/, "if(0)").replace(/Game\.recalculateGains=0/g,
+	"return hl.cookiesPs");
+hl.cps = eval("(" + hl.cpsString + ")");
+hl.ifBought = function (me, callback) {
+	var returnValue;
+	if (me instanceof Game.Upgrade) {
+		me.bought++;
+		returnValue = callback();
+		me.bought--;
+	} else {
+		var buy = me.buy;
+		me.buy = function () {};
+		var price = me.price;
+		me.amount++;
+		me.price = me.basePrice * Math.pow(Game.priceIncrease, me.amount);
+		returnValue = callback();
+		me.amount--;
+		me.price = price;
+		me.buy = buy;
 	}
-	return cookiesPs;
-};
-hl.ifbuy = function (me, callback) {
-	var buy = me.buy;
-	me.buy = function () {};
-	var price = me.price;
-	me.amount++;
-	me.price = me.basePrice * Math.pow(Game.priceIncrease, me.amount);
-	var ret = callback();
-	me.amount--;
-	me.price = price;
-	me.buy = buy;
-	return ret;
+	return returnValue;
 };
 hl.buyingTime = function (chain, baseCookies) {
 	if (chain.length == 0) return 0;
 	var first = chain[0];
 	var price = first.price;
 	if (price <= baseCookies) {
-		return hl.ifbuy(first, function () {
+		return hl.ifBought(first, function () {
 			return hl.buyingTime(chain.slice(1), baseCookies - price)
 		});
 	} else {
-		var waitTime = (price - baseCookies) / hl.CalculateGains();
-		return hl.ifbuy(first, function () {
+		var waitTime = (price - baseCookies) / hl.cps();
+		return hl.ifBought(first, function () {
 			return waitTime + hl.buyingTime(chain.slice(1), 0)
 		});
 	}
 	throw ("Unhandled buyingTime case.");
 };
-hl.markBuilding = function () {
-	var titleColor = [];
-	for (var i = Game.ObjectsN; i--; titleColor[i] = "") {}
+hl.highlight = function () {
+	for (var i = Game.ObjectsN; i--; Game.ObjectsById[i].color = "");
+	for (var i = Game.UpgradesInStore.length; i--;) {
+		Game.UpgradesInStore[i].color = "";
+	}
 	var baseCookies = Game.cookies;
-	var baseCookiesPs = hl.CalculateGains();
-	var CP = Game.ObjectsById.map(function (me) {
-		var GainedCookiesPs = hl.ifbuy(me, function () {
-			return hl.CalculateGains() - baseCookiesPs;
+	var baseCps = hl.cps();
+	var maxCP = 0;
+	var target;
+	var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
+	for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
+		var me = itemOrUpgrade[i];
+		var GainedCookiesPs = hl.ifBought(me, function () {
+			return hl.cps() - baseCps;
 		});
-		return GainedCookiesPs / me.price;
-	});
-	var targetPid = CP.indexOf(Math.max.apply(Math, CP));
-	var target = Game.ObjectsById[targetPid];
-	var chains = [];
+		if (me instanceof Game.Upgrade) {
+			me.price = me.basePrice;
+		}
+		var cp = GainedCookiesPs / me.price;
+		if (cp > maxCP) {
+			maxCP = cp;
+			target = me;
+		}
+	};
+	/* 3-level optimize */
+	hl.chains = [];
 	if (target.price > baseCookies) {
-		chains.push({
+		hl.chains.push({
 			chain: [target],
 			time: hl.buyingTime([target], baseCookies)
 		});
-		for (var b2Pid = Game.ObjectsN; b2Pid--;) {
-			var b2 = Game.ObjectsById[b2Pid];
-			if (b2Pid == targetPid || b2.price >= target.price) continue;
-			chains.push({
+		for (var b2Id = Game.ObjectsById.length - 1; b2Id >= 0; b2Id--) {
+			var b2 = Game.ObjectsById[b2Id];
+			if (b2 === target || b2.price >= target.price) continue;
+			hl.chains.push({
 				chain: [b2, target],
 				time: hl.buyingTime([b2, target], baseCookies)
 			});
-			for (var b1Pid = Game.ObjectsN; b1Pid--;) {
-				var b1 = Game.ObjectsById[b1Pid];
-				if (b1Pid == targetPid || b1.price >= target.price) continue;
-				chains.push({
+			for (var b1Id = Game.ObjectsById.length - 1; b1Id >= 0; b1Id--) {
+				var b1 = Game.ObjectsById[b1Id];
+				if (b1 === target || b1.price >= target.price) continue;
+				if (b1 === b2 && b1 instanceof Game.Upgrade) continue;
+				hl.chains.push({
 					chain: [b1, b2, target],
 					time: hl.buyingTime([b1, b2, target], baseCookies)
 				});
 			}
 		}
-		chains.sort(function (a, b) {
-			return a.time - b.time
-		})
-		/*for (var i = chains.length - 1; i >= 0; i--) {
-			console.log(i, chains[i].chain.map(function (me) {
-				return me.id;
-			}), chains[i].time);
-		};*/
-		var best = chains[0];
-		titleColor[best.chain[0].id] = "#22b14c";
-	}
-	titleColor[targetPid] = "yellow";
-	var titles = document.querySelectorAll(".product .title:first-child");
-	[].forEach.call(titles, function (title, id) {
-		title.style.color = titleColor[id];
+	};
+	hl.chains.sort(function (a, b) {
+		return a.time - b.time
 	});
+	/*
+	for (var i = hl.chains.length - 1; i >= 0; i--) {
+		console.log(i, hl.chains[i].chain.map(function (me) {
+			return me.name;
+		}), hl.chains[i].time);
+	};
+	*/
+	if (hl.chains.length > 0) hl.chains[0].chain[0].color = "#22b14c";
+	target.color = "yellow";
+	/* Update highlight color*/
+	var itemTitles = document.querySelectorAll(".product .title:first-child");
+	[].forEach.call(itemTitles, function (title, id) {
+		title.style.color = Game.ObjectsById[id].color;
+	});
+	var theParent = document.querySelector("#upgrades");
+	for (var id = Game.UpgradesInStore.length; id--;) {
+		var icon = document.querySelector("div#upgrade" + id);
+		icon.style.backgroundColor = Game.UpgradesInStore[id].color;
+		if (Game.UpgradesInStore[id].color != "") {
+			if (theParent.firstChild != icon) theParent.insertBefore(icon, theParent.firstChild);
+			/*if (icon.innerHTML == "") icon.innerHTML =
+				'<div class="upgradeTimer">5m 49s</div>';*/
+		}
+	}
 };
 hl.init = function () {
 	/* init CSS */
@@ -160,38 +188,47 @@ hl.init = function () {
 	css.innerHTML =
 		".timer {\
 			position: relative;\
-			float: left;\
-			color: yellow;\
-			font-size: 12px;\
+			float: right;\
+			font-size: 24px;\
 			z-index: 1000;\
 			font-weight: bold;\
-			text-shadow: 1px 1px 1px #000,0px 1px 0px #000!important;\
+			text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;\
 		}\
-		.HighlighterVersion {\
+		.upgradeTimer {\
+			margin: 6px;\
+			font-weight: bold;\
+			text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;\
+		}\
+		.GrandmaGlassesVersion {\
 			position: absolute;\
 			top: 3px;\
 			right: 3px;\
 			font-size: 12px;\
-			text-shadow: 0px 0px 4px #000,0px 1px 0px #000!important;\
+			text-shadow: 0px 0px 4px #000;\
 		}";
 	document.body.appendChild(css);
+	/* first calc */
 	l('sectionRight').onclick = function () {
 		setTimeout(function () {
 			for (var i = Game.ObjectsN; i--; hl.timer(i)) {}
-			hl.markBuilding();
-		}, 100);
+			clearInterval(hl.highlightTimer);
+			hl.highlight();
+			hl.highlightTimer = setInterval(hl.highlight, 2000);
+		}, 50);
 	};
-	setInterval(hl.markBuilding, 1000);
+	hl.highlight();
+	/* add update */
 	for (var i = Game.ObjectsN; i--;) {
 		hl.timer(i, "loop");
 	}
+	hl.highlightTimer = setInterval(hl.highlight, 2000);
 	/* Add version */
-	var version = l("HighlighterVersion");
+	var version = l("GrandmaGlassesVersion");
 	if (!version) {
 		var version = document.createElement("div");
-		version.className = "HighlighterVersion";
-		version.id = "HighlighterVersion";
-		version.textContent = "Highlighter v.1.036.07"
+		version.className = "GrandmaGlassesVersion";
+		version.id = "GrandmaGlassesVersion";
+		version.textContent = "Grandma's Glasses v.1.036.08"
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
