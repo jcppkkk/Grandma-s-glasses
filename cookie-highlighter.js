@@ -213,7 +213,7 @@ hl.init = function () {
 	/* first calc */
 	l('sectionRight').onclick = function () {
 		setTimeout(function () {
-			for (var i = Game.ObjectsN; i--; hl.timer(i)) {}
+			for (var i = Game.ObjectsN; i--;) hl.timer(i);
 			clearInterval(hl.highlightTimer);
 			hl.highlight();
 			hl.highlightTimer = setInterval(hl.highlight, 2000);
@@ -221,9 +221,7 @@ hl.init = function () {
 	};
 	hl.highlight();
 	/* add update */
-	for (var i = Game.ObjectsN; i--;) {
-		hl.timer(i, "loop");
-	}
+	for (var i = Game.ObjectsN; i--;) hl.timer(i, "loop");
 	hl.highlightTimer = setInterval(hl.highlight, 2000);
 	/* Add version */
 	var version = l("GrandmaGlassesVersion");
