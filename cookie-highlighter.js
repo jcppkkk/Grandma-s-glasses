@@ -7,25 +7,27 @@
 //
 /* External Libraries */
 if (!l) {
-	function l(what) {
+	l = function (what) {
 		return document.getElementById(what);
-	}
+	};
 }
-Number.prototype.toTimeString = function () {
-	if (this <= 0 || isNaN(this) || this == Infinity) return " ";
-	var seconds = Math.ceil(this);
-	var days = Math.floor(seconds / 86400);
-	seconds %= 86400;
-	var hours = Math.floor(seconds / 3600);
-	seconds %= 3600;
-	var minutes = Math.floor(seconds / 60);
-	seconds %= 60;
-	var str = "";
-	if (days) str = str + days + 'd ';
-	if (hours || days) str = str + hours + 'h ';
-	if (minutes || hours || days) str = str + minutes + 'm ';
-	str = str + seconds + 's ';
-	return str;
+if (!Number.prototype.toTimeString) {
+	Number.prototype.toTimeString = function () {
+		if (this <= 0 || isNaN(this) || this == Infinity) return " ";
+		var seconds = Math.ceil(this);
+		var days = Math.floor(seconds / 86400);
+		seconds %= 86400;
+		var hours = Math.floor(seconds / 3600);
+		seconds %= 3600;
+		var minutes = Math.floor(seconds / 60);
+		seconds %= 60;
+		var str = "";
+		if (days) str = str + days + 'd ';
+		if (hours || days) str = str + hours + 'h ';
+		if (minutes || hours || days) str = str + minutes + 'm ';
+		str = str + seconds + 's ';
+		return str;
+	};
 };
 if (!hl) {
 	var hl = {};
@@ -94,80 +96,67 @@ hl.buyingTime = function (chain, baseCookies) {
 	var price = first.price;
 	if (price <= baseCookies) {
 		return hl.ifBought(first, function () {
-			return hl.buyingTime(chain.slice(1), baseCookies - price)
+			return hl.buyingTime(chain.slice(1), baseCookies - price);
 		});
 	} else {
 		var waitTime = (price - baseCookies) / hl.cps();
 		return hl.ifBought(first, function () {
-			return waitTime + hl.buyingTime(chain.slice(1), 0)
+			return waitTime + hl.buyingTime(chain.slice(1), 0);
 		});
 	}
 	throw ("Unhandled buyingTime case.");
 };
 hl.highlight = function () {
-	for (var i = Game.ObjectsN; i--; Game.ObjectsById[i].color = "");
-	for (var i = Game.UpgradesInStore.length; i--;) {
-		Game.UpgradesInStore[i].color = "";
-	}
+	var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
 	var baseCookies = Game.cookies;
 	var baseCps = hl.cps();
 	var maxCP = 0;
 	var target;
-	var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
+	/* init objects */
+	for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
+		var me = itemOrUpgrade[i];
+		me.color = "";
+		if (me instanceof Game.Upgrade) me.price = me.basePrice;
+	}
+	/* best CP */
 	for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
 		var me = itemOrUpgrade[i];
 		var GainedCookiesPs = hl.ifBought(me, function () {
 			return hl.cps() - baseCps;
 		});
-		if (me instanceof Game.Upgrade) {
-			me.price = me.basePrice;
-		}
 		var cp = GainedCookiesPs / me.price;
 		if (cp > maxCP) {
 			maxCP = cp;
 			target = me;
 		}
 	};
-	/* 3-level optimize */
-	hl.chains = [{
-		chain: [target],
-		time: hl.buyingTime([target], baseCookies)
-	}];
-	if (target.price > baseCookies) {
-		for (var b2Id = Game.ObjectsById.length - 1; b2Id >= 0; b2Id--) {
-			var b2 = Game.ObjectsById[b2Id];
-			if (b2 === target || b2.price >= target.price) continue;
-			hl.chains.push({
-				chain: [b2, target],
-				time: hl.buyingTime([b2, target], baseCookies)
-			});
-			for (var b1Id = Game.ObjectsById.length - 1; b1Id >= 0; b1Id--) {
-				var b1 = Game.ObjectsById[b1Id];
-				if (b1 === target || b1.price > baseCookies) continue;
-				if (b1 === b2 && b1 instanceof Game.Upgrade) continue;
-				hl.chains.push({
-					chain: [b1, b2, target],
-					time: hl.buyingTime([b1, b2, target], baseCookies)
-				});
+	/* multiple level optmize */
+	var bestChain = [target];
+	var time = hl.buyingTime([target], baseCookies);
+	while (bestChain[0].price > baseCookies) {
+		var bestAssist = null;
+		for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
+			var me = itemOrUpgrade[i];
+			if (me === target || bestChain.indexOf(me) != -1) continue;
+			var subTime = hl.buyingTime([me].concat(bestChain), baseCookies);
+			if (subTime < time) {
+				time = subTime;
+				bestAssist = me;
 			}
 		}
-	};
-	hl.chains.sort(function (a, b) {
-		return a.time - b.time
-	});
-	/*
-	for (var i = hl.chains.length - 1; i >= 0; i--) {
-		console.log(i, hl.chains[i].chain.map(function (me) {
-			return me.name;
-		}), hl.chains[i].time);
-	};
-	*/
-	bestChain = hl.chains[0].chain;
+		if (bestAssist) bestChain.unshift(bestAssist);
+		else break;
+	}
+	/* Assign highlight color */
 	bestChain.reverse();
-	if (bestChain[2]) bestChain[2].color = "#2CE663";
-	if (bestChain[1]) bestChain[1].color = "#22b14c";
-	bestChain[0].color = "yellow";
-	/* Update highlight color*/
+	var g = 255;
+	for (var i = bestChain.length - 1; i >= 0; i--) {
+		if (bestChain[i].color == "") {
+			bestChain[i].color = "rgb(0," + g + ",0)";
+			g = Math.ceil(g * 0.8);
+		}
+	};
+	/* Update highlight color */
 	var itemTitles = document.querySelectorAll(".product .title:first-child");
 	[].forEach.call(itemTitles, function (title, id) {
 		title.style.color = Game.ObjectsById[id].color;
@@ -191,7 +180,7 @@ hl.init = function () {
 		".timer {\
 			position: relative;\
 			float: right;\
-			font-size: 24px;\
+			font-size: 20px;\
 			z-index: 1000;\
 			font-weight: bold;\
 			text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;\
@@ -228,7 +217,7 @@ hl.init = function () {
 		var version = document.createElement("div");
 		version.className = "GrandmaGlassesVersion";
 		version.id = "GrandmaGlassesVersion";
-		version.textContent = "Grandma's Glasses v.1.036.10";
+		version.textContent = "Grandma's Glasses v.1.036.11";
 		l("storeTitle").appendChild(version);
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
