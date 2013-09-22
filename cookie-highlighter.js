@@ -180,22 +180,22 @@ hl.highlight = function () {
 		if (title.style.color != color) {
 			title.style.color = color;
 		}
-		if (color != "") highlighted = true;
+		if (color == "rgb(0,255,0)") highlighted = true;
 	});
 	if (highlighted) {
 		var pTag = document.createElement('div');
 		pTag.id = "productHighlighted";
 		l("product0").appendChild(pTag);
+		highlighted = false;
 	}
 	var theParent = document.querySelector("#upgrades");
-	highlighted = false;
 	for (var id = Game.UpgradesInStore.length; id--;) {
 		var icon = document.querySelector("div#upgrade" + id);
 		var color = Game.UpgradesInStore[id].color;
 		if (icon.style.backgroundColor != color) {
 			icon.style.backgroundColor = color;
+			if (color == "rgb(0,255,0)") highlighted = true;
 			if (color != "") {
-				highlighted = true;
 				if (theParent.firstChild != icon) theParent.insertBefore(icon, theParent.firstChild);
 			}
 		}
