@@ -244,7 +244,6 @@ hl.init = function () {
 	setInterval(function () {
 		if (l("productHighlighted") || l("upgradeHighlighted")) return;
 		hl.highlight();
-		console.log(new Date() + " highlight.");
 	}, 100);
 	/* Add version */
 	var version = l("GrandmaGlassesVersion");
