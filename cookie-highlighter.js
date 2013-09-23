@@ -258,4 +258,21 @@ hl.init = function () {
 	}
 	Game.particlesAdd(version.textContent + " Loaded!");
 };
-hl.init();
+if (typeof jQuery == 'undefined') {
+	var g = document.createElement("script");
+	g.type = "text/javascript";
+	if (g.readyState) {
+		g.onreadystatechange = function () {
+			if (g.readyState == "loaded" || g.readyState == "complete") {
+				g.onreadystatechange = null;
+				hl.init();
+			}
+		};
+	} else {
+		g.onload = function () {
+			hl.init();
+		};
+	}
+	g.src = "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js";
+	document.getElementsByTagName("head")[0].appendChild(g);
+}
