@@ -49,24 +49,24 @@ hl.timer = function (i, loop, cookieClicks) {
 		p.parentNode.insertBefore(timeDiv, p);
 	}
 	var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
-	var oldText = timeDiv.textContent;
 	timeDiv.textContent = Number(waitTime).toTimeString();
 	/* adjust timer if waitTime not in x.95±0.05 */
 	if (loop == "loop") {
-		var newTime;
-		if (timeDiv.textContent != " ") {
-			var shift = Math.abs((waitTime + 0.55) % 1 - 0.5);
-			if (shift > 0.05) {
-				newTime = ((waitTime + 0.05) % 1);
-			}
-			if (cookieClicks != Game.cookieClicks && newTime > 0.25) {
-				newTime = 0.25;
+		var newTime = 1;
+		if (timeDiv.textContent != " " && waitTime < 3600) {
+			if (cookieClicks != Game.cookieClicks) {
+				newTime = 0.2;
+			} else {
+				var shift = Math.abs((waitTime + 0.55) % 1 - 0.5);
+				if (shift > 0.05) {
+					newTime = ((waitTime + 0.05) % 1);
+				}
 			}
 		}
 		cookieClicks = Game.cookieClicks;
 		window.setTimeout(function () {
 			hl.timer(i, "loop", cookieClicks);
-		}, newTime ? (newTime * 1000) : 1000);
+		}, newTime * 1000);
 	}
 };
 hl.cpsString = Game.CalculateGains.toString().replace(
@@ -110,14 +110,14 @@ hl.buyingTime = function (chain, baseCookies) {
 	throw ("Unhandled buyingTime case.");
 };
 hl.highlight = function () {
+	hl.highlightIsRunning = 1;
 	var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
 	var baseCookies = Game.cookies;
 	/* init objects */
-	for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
-		var me = itemOrUpgrade[i];
+	itemOrUpgrade.forEach(function (me) {
 		me.color = "";
 		if (me instanceof Game.Upgrade) me.price = me.basePrice;
-	}
+	});
 	/* best bestGainedCpsPs after payback */
 	var target;
 	var bestGainedCpsPs = 0;
@@ -174,37 +174,24 @@ hl.highlight = function () {
 	}
 	/* Update highlight color */
 	var itemTitles = document.querySelectorAll(".product .title:first-child");
-	var highlighted = false;
 	[].forEach.call(itemTitles, function (title, id) {
 		var color = Game.ObjectsById[id].color
 		if (title.style.color != color) {
 			title.style.color = color;
 		}
-		if (color == "rgb(0,255,0)") highlighted = true;
 	});
-	if (highlighted) {
-		var pTag = document.createElement('div');
-		pTag.id = "productHighlighted";
-		l("product0").appendChild(pTag);
-		highlighted = false;
-	}
 	var theParent = document.querySelector("#upgrades");
 	for (var id = Game.UpgradesInStore.length; id--;) {
 		var icon = document.querySelector("div#upgrade" + id);
 		var color = Game.UpgradesInStore[id].color;
 		if (icon.style.backgroundColor != color) {
 			icon.style.backgroundColor = color;
-			if (color == "rgb(0,255,0)") highlighted = true;
-			if (color != "") {
-				if (theParent.firstChild != icon) theParent.insertBefore(icon, theParent.firstChild);
-			}
+		}
+		if (color != "" && theParent.firstChild != icon) {
+			theParent.insertBefore(icon, theParent.firstChild);
 		}
 	}
-	if (highlighted) {
-		var uTag = document.createElement('div');
-		uTag.id = "upgradeHighlighted";
-		l("upgrade0").appendChild(uTag);
-	}
+	hl.highlightIsRunning = 0;
 };
 hl.init = function () {
 	/* init CSS */
@@ -219,6 +206,7 @@ hl.init = function () {
 			z-index: 1000;\
 			font-weight: bold;\
 			text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;\
+			pointer-events : none;\
 		}\
 		.upgradeTimer {\
 			margin: 6px;\
@@ -237,22 +225,37 @@ hl.init = function () {
 	for (var i = Game.ObjectsN; i--;) hl.timer(i, "loop");
 	l('sectionRight').onclick = function () {
 		setTimeout(function () {
-			for (var i = Game.ObjectsN; i--;) hl.timer(i);
-		}, 50);
+			for (var i = Game.ObjectsN; i--;) {
+				hl.timer(i);
+			}
+			if (!hl.highlightIsRunning) {
+				hl.highlight();
+			}
+		}, 100);
 	};
 	/* highlight updater */
+	hl.highlightIsRunning = 0;
 	setInterval(function () {
-		if (l("productHighlighted") || l("upgradeHighlighted")) return;
+		if (hl.highlightIsRunning) return;
+		var a = document.querySelectorAll("div.product div.title[style]");
+		for (var i = a.length - 1; i >= 0; i--) {
+			if (a[i].style && a[i].style.color == "rgb(0, 255, 0)") {
+				return;
+			}
+		}
+		var upgrade = document.querySelector("div#upgrades>div");
+		if (upgrade.style.backgroundColor == "rgb(0, 255, 0)") {
+			return;
+		}
 		hl.highlight();
-	}, 100);
-	setInterval(hl.highlight, 10000);
+	}, 200);
 	/* Add version */
 	var version = l("GrandmaGlassesVersion");
 	if (!version) {
 		var version = document.createElement("div");
 		version.className = "GrandmaGlassesVersion";
 		version.id = "GrandmaGlassesVersion";
-		version.textContent = "Grandma's Glasses v.1.036.12";
+		version.textContent = "Grandma's Glasses v.1.036.13";
 		var parent = l("donate");
 		parent.insertBefore(version, parent.firstChild);
 	}
