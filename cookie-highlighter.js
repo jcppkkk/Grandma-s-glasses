@@ -108,8 +108,8 @@ hl.buyingTime = function (chain, baseCookies) {
 	}
 	throw ("Unhandled buyingTime case.");
 };
-hl.highlight = function () {
-	hl.highlightIsRunning = 1;
+hl.calculateChain = function () {
+	hl.calculateChainIsRunning = 1;
 	var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
 	var baseCookies = Game.cookies;
 	/* init objects */
@@ -190,7 +190,7 @@ hl.highlight = function () {
 			theParent.insertBefore(icon, theParent.firstChild);
 		}
 	}
-	hl.highlightIsRunning = 0;
+	hl.calculateChainIsRunning = 0;
 };
 hl.init = function () {
 	/* init CSS */
@@ -227,15 +227,15 @@ hl.init = function () {
 			for (var i = Game.ObjectsN; i--;) {
 				hl.timer(i);
 			}
-			if (!hl.highlightIsRunning) {
-				hl.highlight();
+			if (!hl.calculateChainIsRunning) {
+				hl.calculateChain();
 			}
 		}, 100);
 	};
 	/* highlight updater */
-	hl.highlightIsRunning = 0;
+	hl.calculateChainIsRunning = 0;
 	setInterval(function () {
-		if (hl.highlightIsRunning) return;
+		if (hl.calculateChainIsRunning) return;
 		var a = document.querySelectorAll("div.product div.title[style]");
 		for (var i = a.length - 1; i >= 0; i--) {
 			if (a[i].style && a[i].style.color == "rgb(0, 255, 0)") {
@@ -243,10 +243,10 @@ hl.init = function () {
 			}
 		}
 		var upgrade = document.querySelector("div#upgrades>div");
-		if (upgrade.style.backgroundColor == "rgb(0, 255, 0)") {
+		if (upgrade && upgrade.style.backgroundColor == "rgb(0, 255, 0)") {
 			return;
 		}
-		hl.highlight();
+		hl.calculateChain();
 	}, 200);
 	/* Add version */
 	var version = l("GrandmaGlassesVersion");
