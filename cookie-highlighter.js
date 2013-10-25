@@ -14,24 +14,15 @@ if (!l) {
 if (!Number.prototype.toTimeString) {
 	Number.prototype.toTimeString = function () {
 		if (this <= 0 || isNaN(this) || this == Infinity) return " ";
-		var seconds = Math.ceil(this);
-		var days = Math.floor(seconds / 86400);
-		seconds %= 86400;
-		var hours = Math.floor(seconds / 3600);
-		seconds %= 3600;
-		var minutes = Math.floor(seconds / 60);
-		seconds %= 60;
-		var str = "";
-		if (days) {
-			str = days + 'd ' + hours + 'h ';
-		} else if (hours) {
-			str = hours + 'h ' + minutes + 'm ';
-		} else if (minutes) {
-			str = minutes + 'm ' + seconds + 's ';
-		} else {
-			str = seconds + 's ';
-		}
-		return str;
+		var sec = Math.ceil(this);
+		var day = Math.floor(sec / 86400);
+		var hour = Math.floor((sec / 3600) % 24);
+		var min = Math.floor((sec / 60) % 60);
+		sec %= 60;
+		if (day) return "" + day + 'd ' + hour + 'h ';
+		if (hour) return "" + hour + 'h ' + min + 'm ';
+		if (min) return "" + min + 'm ' + sec + 's ';
+		return "" + sec + 's ';
 	};
 };
 if (!hl) {
