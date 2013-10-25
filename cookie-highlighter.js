@@ -25,10 +25,10 @@ if (!Number.prototype.toTimeString) {
 		return "" + sec + 's ';
 	};
 };
-if (!hl) {
-	var hl = {};
+if (!gg) {
+	var gg = {};
 }
-hl.timer = function (i, loop, cookieClicks) {
+gg.timer = function (i, loop, cookieClicks) {
 	var id = "timer" + i;
 	/* update timer text */
 	var timeDiv = l(id);
@@ -56,11 +56,11 @@ hl.timer = function (i, loop, cookieClicks) {
 		}
 		cookieClicks = Game.cookieClicks;
 		window.setTimeout(function () {
-			hl.timer(i, "loop", cookieClicks);
+			gg.timer(i, "loop", cookieClicks);
 		}, newTime * 1000);
 	}
 };
-hl.ifBought = function (me, callback) {
+gg.ifBought = function (me, callback) {
 	var returnValue;
 	if (me instanceof Game.Upgrade) {
 		me.bought++;
@@ -79,24 +79,24 @@ hl.ifBought = function (me, callback) {
 	}
 	return returnValue;
 };
-hl.buyingTime = function (chain, baseCookies) {
+gg.buyingTime = function (chain, baseCookies) {
 	if (chain.length == 0) return 0;
 	var first = chain[0];
 	var price = first.price;
 	if (price <= baseCookies) {
-		return hl.ifBought(first, function () {
-			return hl.buyingTime(chain.slice(1), baseCookies - price);
+		return gg.ifBought(first, function () {
+			return gg.buyingTime(chain.slice(1), baseCookies - price);
 		});
 	} else {
-		var waitTime = (price - baseCookies) / hl.cps();
-		return hl.ifBought(first, function () {
-			return waitTime + hl.buyingTime(chain.slice(1), 0);
+		var waitTime = (price - baseCookies) / gg.cps();
+		return gg.ifBought(first, function () {
+			return waitTime + gg.buyingTime(chain.slice(1), 0);
 		});
 	}
 	throw ("Unhandled buyingTime case.");
 };
-hl.calculateChain = function () {
-	hl.calculateChainIsRunning = 1;
+gg.calculateChain = function () {
+	gg.calculateChainIsRunning = 1;
 	var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
 	var baseCookies = Game.cookies;
 	/* init objects */
@@ -107,15 +107,15 @@ hl.calculateChain = function () {
 	/* best bestGainedCpsPs after payback */
 	var target;
 	var bestGainedCpsPs = 0;
-	var baseCps = hl.cps();
+	var baseCps = gg.cps();
 	if (baseCps) {
 		for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
 			var me = itemOrUpgrade[i];
 			var paybackTime;
 			var cpsAfterBought;
 			var GainedCps;
-			hl.ifBought(me, function () {
-				cpsAfterBought = hl.cps();
+			gg.ifBought(me, function () {
+				cpsAfterBought = gg.cps();
 			});
 			if (me.price > baseCookies) {
 				paybackTime = (me.price - baseCookies) / baseCps;
@@ -134,13 +134,13 @@ hl.calculateChain = function () {
 	}
 	/* multiple level optmize */
 	var bestChain = [target];
-	var time = hl.buyingTime([target], baseCookies);
+	var time = gg.buyingTime([target], baseCookies);
 	while (bestChain[0].price > baseCookies) {
 		var bestAssist = null;
 		for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
 			var me = itemOrUpgrade[i];
 			if (me === target) continue;
-			var subTime = hl.buyingTime([me].concat(bestChain), baseCookies);
+			var subTime = gg.buyingTime([me].concat(bestChain), baseCookies);
 			if (subTime < time) {
 				time = subTime;
 				bestAssist = me;
@@ -177,25 +177,25 @@ hl.calculateChain = function () {
 			theParent.insertBefore(icon, theParent.firstChild);
 		}
 	}
-	hl.calculateChainIsRunning = 0;
+	gg.calculateChainIsRunning = 0;
 };
-hl.init = function () {
+gg.init = function () {
 	/* 
 	Initial cps function 
 	*/
-	hl.cpsReplace = [
-		[/Game.(cookiesPs)/g, "hl.$1"],
-		[/Game.(Win)/g, "hl.$1"],
-		[/Game.(computedMouseCps)/g, "hl.$1"],
-		[/Game.(globalCpsMult)/g, "hl.$1"],
+	gg.cpsReplace = [
+		[/Game.(cookiesPs)/g, "gg.$1"],
+		[/Game.(Win)/g, "gg.$1"],
+		[/Game.(computedMouseCps)/g, "gg.$1"],
+		[/Game.(globalCpsMult)/g, "gg.$1"],
 		[/for.*cpsAchievs.*\)/, "if(0)"],
-		[/Game\.recalculateGains=0/g, "return hl.cookiesPs"]
+		[/Game\.recalculateGains=0/g, "return gg.cookiesPs"]
 	];
-	hl.cpsString = Game.CalculateGains.toString();
-	for (i in hl.cpsReplace) {
-		hl.cpsString = hl.cpsString.replace(hl.cpsReplace[i][0], hl.cpsReplace[i][1]);
+	gg.cpsString = Game.CalculateGains.toString();
+	for (i in gg.cpsReplace) {
+		gg.cpsString = gg.cpsString.replace(gg.cpsReplace[i][0], gg.cpsReplace[i][1]);
 	}
-	hl.cps = eval("(" + hl.cpsString + ")");
+	gg.cps = eval("(" + gg.cpsString + ")");
 	/* 
 	Initial CSS 
 	*/
@@ -228,23 +228,23 @@ hl.init = function () {
 	/* 
 	Initial timer updater
 	 */
-	for (var i = Game.ObjectsN; i--;) hl.timer(i, "loop");
+	for (var i = Game.ObjectsN; i--;) gg.timer(i, "loop");
 	l('sectionRight').onclick = function () {
 		setTimeout(function () {
 			for (var i = Game.ObjectsN; i--;) {
-				hl.timer(i);
+				gg.timer(i);
 			}
-			if (!hl.calculateChainIsRunning) {
-				hl.calculateChain();
+			if (!gg.calculateChainIsRunning) {
+				gg.calculateChain();
 			}
 		}, 100);
 	};
 	/* 
 	Initial Calculate Chain
 	*/
-	hl.calculateChainIsRunning = 0;
+	gg.calculateChainIsRunning = 0;
 	setInterval(function () {
-		if (hl.calculateChainIsRunning) return;
+		if (gg.calculateChainIsRunning) return;
 		var a = document.querySelectorAll("div.product div.title[style]");
 		for (var i = a.length - 1; i >= 0; i--) {
 			if (a[i].style && a[i].style.color == "rgb(0, 255, 0)") {
@@ -255,7 +255,7 @@ hl.init = function () {
 		if (upgrade && upgrade.style.backgroundColor == "rgb(0, 255, 0)") {
 			return;
 		}
-		hl.calculateChain();
+		gg.calculateChain();
 	}, 200);
 	/* 
 	Add version
@@ -278,12 +278,12 @@ if (typeof jQuery == 'undefined') {
 		g.onreadystatechange = function () {
 			if (g.readyState == "loaded" || g.readyState == "complete") {
 				g.onreadystatechange = null;
-				hl.init();
+				gg.init();
 			}
 		};
 	} else {
 		g.onload = function () {
-			hl.init();
+			gg.init();
 		};
 	}
 	g.src = "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js";
