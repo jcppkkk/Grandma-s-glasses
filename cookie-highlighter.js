@@ -60,19 +60,6 @@ hl.timer = function (i, loop, cookieClicks) {
 		}, newTime * 1000);
 	}
 };
-hl.cpsReplace = [
-	[/Game.(cookiesPs)/g, "hl.$1"],
-	[/Game.(Win)/g, "hl.$1"],
-	[/Game.(computedMouseCps)/g, "hl.$1"],
-	[/Game.(globalCpsMult)/g, "hl.$1"],
-	[/for.*cpsAchievs.*\)/, "if(0)"],
-	[/Game\.recalculateGains=0/g, "return hl.cookiesPs"]
-];
-hl.cpsString = Game.CalculateGains.toString();
-for (i in hl.cpsReplace) {
-	hl.cpsString = hl.cpsString.replace(hl.cpsReplace[i][0], hl.cpsReplace[i][1]);
-}
-hl.cps = eval("(" + hl.cpsString + ")");
 hl.ifBought = function (me, callback) {
 	var returnValue;
 	if (me instanceof Game.Upgrade) {
@@ -193,7 +180,25 @@ hl.calculateChain = function () {
 	hl.calculateChainIsRunning = 0;
 };
 hl.init = function () {
-	/* init CSS */
+	/* 
+	Initial cps function 
+	*/
+	hl.cpsReplace = [
+		[/Game.(cookiesPs)/g, "hl.$1"],
+		[/Game.(Win)/g, "hl.$1"],
+		[/Game.(computedMouseCps)/g, "hl.$1"],
+		[/Game.(globalCpsMult)/g, "hl.$1"],
+		[/for.*cpsAchievs.*\)/, "if(0)"],
+		[/Game\.recalculateGains=0/g, "return hl.cookiesPs"]
+	];
+	hl.cpsString = Game.CalculateGains.toString();
+	for (i in hl.cpsReplace) {
+		hl.cpsString = hl.cpsString.replace(hl.cpsReplace[i][0], hl.cpsReplace[i][1]);
+	}
+	hl.cps = eval("(" + hl.cpsString + ")");
+	/* 
+	Initial CSS 
+	*/
 	var css = document.createElement("style");
 	css.type = "text/css";
 	css.innerHTML =
@@ -220,7 +225,9 @@ hl.init = function () {
 			text-shadow: 0px 0px 4px #000;\
 		}";
 	document.body.appendChild(css);
-	/* timer updater */
+	/* 
+	Initial timer updater
+	 */
 	for (var i = Game.ObjectsN; i--;) hl.timer(i, "loop");
 	l('sectionRight').onclick = function () {
 		setTimeout(function () {
@@ -232,7 +239,9 @@ hl.init = function () {
 			}
 		}, 100);
 	};
-	/* highlight updater */
+	/* 
+	Initial Calculate Chain
+	*/
 	hl.calculateChainIsRunning = 0;
 	setInterval(function () {
 		if (hl.calculateChainIsRunning) return;
@@ -248,7 +257,9 @@ hl.init = function () {
 		}
 		hl.calculateChain();
 	}, 200);
-	/* Add version */
+	/* 
+	Add version
+	*/
 	var version = l("GrandmaGlassesVersion");
 	if (!version) {
 		var version = document.createElement("div");
