@@ -69,10 +69,18 @@ hl.timer = function (i, loop, cookieClicks) {
 		}, newTime * 1000);
 	}
 };
-hl.cpsString = Game.CalculateGains.toString().replace(
-	/Game\.(cookiesPs|Win|computedMouseCps)/g, "hl.$1").replace(
-	/for.*cpsAchievs.*\)/, "if(0)").replace(/Game\.recalculateGains=0/g,
-	"return hl.cookiesPs");
+hl.cpsReplace = [
+	[/Game.(cookiesPs)/g, "hl.$1"],
+	[/Game.(Win)/g, "hl.$1"],
+	[/Game.(computedMouseCps)/g, "hl.$1"],
+	[/Game.(globalCpsMult)/g, "hl.$1"],
+	[/for.*cpsAchievs.*\)/, "if(0)"],
+	[/Game\.recalculateGains=0/g, "return hl.cookiesPs"]
+];
+hl.cpsString = Game.CalculateGains.toString();
+for (i in hl.cpsReplace) {
+	hl.cpsString = hl.cpsString.replace(hl.cpsReplace[i][0], hl.cpsReplace[i][1]);
+}
 hl.cps = eval("(" + hl.cpsString + ")");
 hl.ifBought = function (me, callback) {
 	var returnValue;
