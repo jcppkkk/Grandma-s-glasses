@@ -186,6 +186,37 @@ if (!gg) {
 			});
 		}
 	};
+	/*
+		Assign highlight color
+	*/
+	gg.setColor = function (chain) {
+		chain.reverse();
+		var g = 255;
+		for (var i = chain.length - 1; i >= 0; i--) {
+			if (chain[i].color == "") {
+				chain[i].color = "rgb(0," + g + ",0)";
+				g = Math.ceil(g * 0.8);
+			}
+		}
+		var itemTitles = document.querySelectorAll(".product .title:first-child");
+		[].forEach.call(itemTitles, function (title, id) {
+			var color = Game.ObjectsById[id].color
+			if (title.style.color != color) {
+				title.style.color = color;
+			}
+		});
+		var upgrades = document.querySelector("#upgrades");
+		for (var id = Game.UpgradesInStore.length; id--;) {
+			var icon = document.querySelector("div#upgrade" + id);
+			var color = Game.UpgradesInStore[id].color;
+			if (icon.style.backgroundColor != color) {
+				icon.style.backgroundColor = color;
+			}
+			if (color != "" && upgrades.firstChild != icon) {
+				upgrades.insertBefore(icon, upgrades.firstChild);
+			}
+		}
+	}
 	gg.calculateChain = function () {
 		gg.calculateChainIsRunning = 1;
 		var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
@@ -244,39 +275,8 @@ if (!gg) {
 			if (bestAssist) bestChain.unshift(bestAssist);
 			else break;
 		}
-		/*
-			Assign highlight color
-		*/
-		bestChain.reverse();
-		var g = 255;
-		for (var i = bestChain.length - 1; i >= 0; i--) {
-			if (bestChain[i].color == "") {
-				bestChain[i].color = "rgb(0," + g + ",0)";
-				g = Math.ceil(g * 0.8);
-			}
-		}
-		/*
-			Update highlight color
-		*/
-		var itemTitles = document.querySelectorAll(".product .title:first-child");
-		[].forEach.call(itemTitles, function (title, id) {
-			var color = Game.ObjectsById[id].color
-			if (title.style.color != color) {
-				title.style.color = color;
-			}
-		});
-		var theParent = document.querySelector("#upgrades");
-		for (var id = Game.UpgradesInStore.length; id--;) {
-			var icon = document.querySelector("div#upgrade" + id);
-			var color = Game.UpgradesInStore[id].color;
-			if (icon.style.backgroundColor != color) {
-				icon.style.backgroundColor = color;
-			}
-			if (color != "" && theParent.firstChild != icon) {
-				theParent.insertBefore(icon, theParent.firstChild);
-			}
-		}
 		gg.calculateChainIsRunning = 0;
+		gg.setColor(bestChain);
 	};
 	/*
 		Start Game
