@@ -181,7 +181,6 @@ if (!gg) {
 				return waitTime + gg.buyingTime(chain.slice(1), 0);
 			});
 		}
-		throw ("Unhandled buyingTime case.");
 	};
 	gg.calculateChain = function () {
 		gg.calculateChainIsRunning = 1;
@@ -220,7 +219,7 @@ if (!gg) {
 		} else {
 			target = Game.ObjectsById[0];
 		}
-		/* multiple level optmize */
+		/* multiple level optimize */
 		var bestChain = [target];
 		var time = gg.buyingTime([target], baseCookies);
 		while (bestChain[0].price > baseCookies) {
