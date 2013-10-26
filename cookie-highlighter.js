@@ -5,7 +5,9 @@
 // Official Website -> http://scyu.logdown.com/posts/2013/09/12/grandma-s-glasses
 // Reddit Thread 	-> http://redd.it/1mkwx8
 //
-/* External Libraries */
+/* 
+	External Libraries
+*/
 if (!l) {
 	l = function (what) {
 		return document.getElementById(what);
@@ -118,7 +120,9 @@ if (!gg) {
 	};
 	gg.timer = function (i, loop, cookieClicks) {
 		var id = "timer" + i;
-		/* update timer text */
+		/* 
+			update timer text
+		*/
 		var timeDiv = l(id);
 		if (!timeDiv) {
 			var timeDiv = document.createElement('div');
@@ -129,7 +133,7 @@ if (!gg) {
 		}
 		var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
 		timeDiv.textContent = Number(waitTime).toTimeString();
-		/* adjust timer if waitTime not in x.95±0.05 */
+		// adjust timer if waitTime not in x.95±0.05
 		if (loop == "loop") {
 			var newTime = 1;
 			if (timeDiv.textContent != " " && waitTime < 3600) {
@@ -186,12 +190,14 @@ if (!gg) {
 		gg.calculateChainIsRunning = 1;
 		var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
 		var baseCookies = Game.cookies;
-		/* init objects */
+		// Initial object color
 		itemOrUpgrade.forEach(function (me) {
 			me.color = "";
 			if (me instanceof Game.Upgrade) me.price = me.basePrice;
 		});
-		/* best bestGainedCpsPs after payback */
+		/*
+			best bestGainedCpsPs after payback
+		*/
 		var target;
 		var bestGainedCpsPs = 0;
 		var baseCps = gg.cps();
@@ -219,7 +225,9 @@ if (!gg) {
 		} else {
 			target = Game.ObjectsById[0];
 		}
-		/* multiple level optimize */
+		/*
+			multiple level optimize
+		*/
 		var bestChain = [target];
 		var time = gg.buyingTime([target], baseCookies);
 		while (bestChain[0].price > baseCookies) {
@@ -236,7 +244,9 @@ if (!gg) {
 			if (bestAssist) bestChain.unshift(bestAssist);
 			else break;
 		}
-		/* Assign highlight color */
+		/*
+			Assign highlight color
+		*/
 		bestChain.reverse();
 		var g = 255;
 		for (var i = bestChain.length - 1; i >= 0; i--) {
@@ -245,7 +255,9 @@ if (!gg) {
 				g = Math.ceil(g * 0.8);
 			}
 		}
-		/* Update highlight color */
+		/*
+			Update highlight color
+		*/
 		var itemTitles = document.querySelectorAll(".product .title:first-child");
 		[].forEach.call(itemTitles, function (title, id) {
 			var color = Game.ObjectsById[id].color
