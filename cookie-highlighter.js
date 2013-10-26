@@ -217,63 +217,35 @@ if (!gg) {
 			}
 		}
 	}
+	/*
+		GainedCpsPs after entire chain payback (GainedCps / paybackTime)
+	*/
+	gg.GainedCpsPs = function (chain) {
+		// body...
+	}
+	/*
+		multiple level optimize
+		choose Best GainedCpsPs after entire chain payback (GainedCps / paybackTime)
+	*/
 	gg.calculateChain = function () {
 		gg.calculateChainIsRunning = 1;
-		var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
-		var baseCookies = Game.cookies;
-		/*
-			best GainedCpsPs after payback
-		*/
-		var target;
-		var bestGainedCpsPs = 0;
-		var baseCps = gg.cps();
-		if (baseCps) {
-			for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
-				var me = itemOrUpgrade[i];
-				var paybackTime;
-				var cpsAfterBought;
-				var GainedCps;
-				gg.ifBought(me, function () {
-					cpsAfterBought = gg.cps();
-				});
-				if (me.price > baseCookies) {
-					paybackTime = (me.price - baseCookies) / baseCps;
-					paybackTime += baseCookies / cpsAfterBought;
-				} else {
-					paybackTime = me.price / cpsAfterBought;
+		var all_item = Game.ObjectsById.concat(Game.UpgradesInStore);
+		var bestChain = [];
+		var bestRate = 0;
+		do {
+			var best = null;
+			all_item.forEach(function (me) {
+				var rate = gg.GainedCpsPs([me].concat(bestChain));
+				if (rate > bestRate) {
+					bestRate = rate;
+					best = me;
 				}
-				var gainedCpsPs = (cpsAfterBought - baseCps) / paybackTime;
-				if (gainedCpsPs > bestGainedCpsPs) {
-					bestGainedCpsPs = gainedCpsPs;
-					target = me;
-				}
-			}
-		} else {
-			target = Game.ObjectsById[0];
-		}
-		/*
-			multiple level optimize
-			choose Best GainedCpsPs after payback (GainedCpsPs / paybackTime)
-		*/
-		var bestChain = [target];
-		var time = gg.buyingTime([target], baseCookies);
-		while (bestChain[0].price > baseCookies) {
-			var bestAssist = null;
-			for (var i = itemOrUpgrade.length - 1; i >= 0; i--) {
-				var me = itemOrUpgrade[i];
-				if (me === target) continue;
-				var subTime = gg.buyingTime([me].concat(bestChain), baseCookies);
-				if (subTime < time) {
-					time = subTime;
-					bestAssist = me;
-				}
-			}
-			if (bestAssist) bestChain.unshift(bestAssist);
-			else break;
-		}
+			});
+			if (best) bestChain.unshift(best);
+		} while (!best || bestChain.length >= 5)
 		gg.calculateChainIsRunning = 0;
 		// Initial object color
-		itemOrUpgrade.forEach(function (me) {
+		all_item.forEach(function (me) {
 			me.color = "";
 			if (me instanceof Game.Upgrade) me.price = me.basePrice;
 		});
