@@ -221,13 +221,8 @@ if (!gg) {
 		gg.calculateChainIsRunning = 1;
 		var itemOrUpgrade = Game.ObjectsById.concat(Game.UpgradesInStore);
 		var baseCookies = Game.cookies;
-		// Initial object color
-		itemOrUpgrade.forEach(function (me) {
-			me.color = "";
-			if (me instanceof Game.Upgrade) me.price = me.basePrice;
-		});
 		/*
-			best bestGainedCpsPs after payback
+			best GainedCpsPs after payback
 		*/
 		var target;
 		var bestGainedCpsPs = 0;
@@ -258,6 +253,7 @@ if (!gg) {
 		}
 		/*
 			multiple level optimize
+			choose Best GainedCpsPs after payback (GainedCpsPs / paybackTime)
 		*/
 		var bestChain = [target];
 		var time = gg.buyingTime([target], baseCookies);
@@ -276,6 +272,11 @@ if (!gg) {
 			else break;
 		}
 		gg.calculateChainIsRunning = 0;
+		// Initial object color
+		itemOrUpgrade.forEach(function (me) {
+			me.color = "";
+			if (me instanceof Game.Upgrade) me.price = me.basePrice;
+		});
 		gg.setColor(bestChain);
 	};
 	/*
