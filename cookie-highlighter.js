@@ -112,11 +112,11 @@ if (!gg) {
 			var version = document.createElement("div");
 			version.className = "GrandmaGlassesVersion";
 			version.id = "GrandmaGlassesVersion";
-			version.textContent = "Grandma's Glasses v.1.036.13";
+			version.textContent = "Grandma's Glasses v.1.0939.1";
 			var parent = l("donate");
 			parent.insertBefore(version, parent.firstChild);
 		}
-		Game.particlesAdd(version.textContent + " Loaded!");
+		Game.Popup(version.textContent + " Loaded!");
 	};
 	gg.timer = function (i, loop, cookieClicks) {
 		var id = "timer" + i;
