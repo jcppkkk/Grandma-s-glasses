@@ -218,14 +218,36 @@ if (!gg) {
 		}
 	}
 	/*
-		GainedCpsPs after entire chain payback (GainedCps / paybackTime)
+		cpsAcceleration after entire chain payback (gainedCps / paybackTime)
 	*/
-	gg.GainedCpsPs = function (chain) {
-		// body...
+	gg.cpsAcceleration = function (chain) {
+		var initCookies = ;
+		var restCookies = ;
+		var finalCps = ;
+		// gainedCps
+		var initialCps = gg.cps();
+		var timeForChain = 0;
+		var timeReducedAtFirst = 0;
+		for (var i = 0, cookies = initCookies; i < chain.length; i++) {
+			if (cookies >= chainStatus[i].itemPrice) {
+				cookies -= chainStatus[i].itemPrice;
+				timeReducedAtFirst += chainStatus[i].waitTime;
+			} else {
+				timeReducedAtFirst += chainStatus[i].waitTime * (cookies / chainStatus[i].itemPrice);
+				break;
+			}
+		};
+		var timeForPayback = (initCookies - restCookies) / finalCps;
+		//
+		var gainedCps = finalCps - initialCps;
+		var paybackTimeForChain = timeForChain - timeReducedAtFirst + timeForPayback;
+		//
+		var cpsAcceleration = gainedCps / paybackTimeForChain
+		return cpsAcceleration;
 	}
 	/*
 		multiple level optimize
-		choose Best GainedCpsPs after entire chain payback (GainedCps / paybackTime)
+		choose Best cpsAcceleration after entire chain payback (gainedCps / paybackTime)
 	*/
 	gg.calculateChain = function () {
 		gg.calculateChainIsRunning = 1;
@@ -235,7 +257,7 @@ if (!gg) {
 		do {
 			var best = null;
 			all_item.forEach(function (me) {
-				var rate = gg.GainedCpsPs([me].concat(bestChain));
+				var rate = gg.cpsAcceleration([me].concat(bestChain));
 				if (rate > bestRate) {
 					bestRate = rate;
 					best = me;
