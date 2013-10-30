@@ -28,21 +28,19 @@ Number.prototype.toTimeString = function () {
 if (!gg) {
 	var gg = {};
 	/* 
-		Initial cps function 
+		Add version 
 	*/
-	gg.initCpsFunction = function () {
-		gg.cpsReplace = [
-			[/Game.(cookiesPs)/g, "gg.$1"],
-			[/Game.(computedMouseCps)/g, "gg.$1"],
-			[/Game.(globalCpsMult)/g, "gg.$1"],
-			[/.*cpsAchievs.*/g, ""],
-			[/Game\.recalculateGains=0/g, "return gg.cookiesPs"]
-		];
-		gg.cpsString = Game.CalculateGains.toString();
-		for (i in gg.cpsReplace) {
-			gg.cpsString = gg.cpsString.replace(gg.cpsReplace[i][0], gg.cpsReplace[i][1]);
+	gg.addGlassesVersion = function () {
+		var version = l("GrandmaGlassesVersion");
+		if (!version) {
+			var version = document.createElement("div");
+			version.className = "GrandmaGlassesVersion";
+			version.id = "GrandmaGlassesVersion";
+			version.textContent = "Grandma's Glasses v.1.0393.1";
+			var parent = l("donate");
+			parent.insertBefore(version, parent.firstChild);
 		}
-		gg.cps = eval("(" + gg.cpsString + ")");
+		Game.Popup(version.textContent + " Loaded!");
 	};
 	/* 
 		Initial CSS
@@ -76,6 +74,23 @@ if (!gg) {
 		document.body.appendChild(css);
 	}
 	/* 
+		Initial cps function 
+	*/
+	gg.initCpsFunction = function () {
+		gg.cpsReplace = [
+			[/Game.(cookiesPs)/g, "gg.$1"],
+			[/Game.(computedMouseCps)/g, "gg.$1"],
+			[/Game.(globalCpsMult)/g, "gg.$1"],
+			[/.*cpsAchievs.*/g, ""],
+			[/Game\.recalculateGains=0/g, "return gg.cookiesPs"]
+		];
+		gg.cpsString = Game.CalculateGains.toString();
+		for (i in gg.cpsReplace) {
+			gg.cpsString = gg.cpsString.replace(gg.cpsReplace[i][0], gg.cpsReplace[i][1]);
+		}
+		gg.cps = eval("(" + gg.cpsString + ")");
+	};
+	/* 
 		Auto Update Timer
 	*/
 	gg.autoUpdateTimer = function () {
@@ -103,21 +118,6 @@ if (!gg) {
 			gg.calculateChain();
 		}, 200);
 	}
-	/* 
-		Add version 
-	*/
-	gg.addGlassesVersion = function () {
-		var version = l("GrandmaGlassesVersion");
-		if (!version) {
-			var version = document.createElement("div");
-			version.className = "GrandmaGlassesVersion";
-			version.id = "GrandmaGlassesVersion";
-			version.textContent = "Grandma's Glasses v.1.0939.1";
-			var parent = l("donate");
-			parent.insertBefore(version, parent.firstChild);
-		}
-		Game.Popup(version.textContent + " Loaded!");
-	};
 	gg.timer = function (i, loop, cookieClicks) {
 		var id = "timer" + i;
 		/* 
