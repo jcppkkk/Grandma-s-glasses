@@ -8,6 +8,7 @@
 /* 
 	External Libraries
 */
+GGVERSION = "1st pair for v.1.0411";
 if (!l) {
 	l = function (what) {
 		return document.getElementById(what);
@@ -36,7 +37,7 @@ if (!gg) {
 			var version = document.createElement("div");
 			version.className = "GrandmaGlassesVersion";
 			version.id = "GrandmaGlassesVersion";
-			version.textContent = "Grandma's Glasses v.1.0393.1";
+			version.textContent = "Grandma's Glasses, " + GGVERSION;
 			var parent = l("donate");
 			parent.insertBefore(version, parent.firstChild);
 		}
