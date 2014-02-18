@@ -128,8 +128,8 @@ if (!gg) {
 			var timeDiv = document.createElement('div');
 			timeDiv.className = "timer";
 			timeDiv.id = id;
-			var p = l("product" + i)
-			p.parentNode.insertBefore(timeDiv, p);
+			var p = l("product" + i);
+			p.appendChild(timeDiv);
 		}
 		var waitTime = (Game.ObjectsById[i].price - Game.cookies) / Game.cookiesPs;
 		timeDiv.textContent = Number(waitTime).toTimeString();
