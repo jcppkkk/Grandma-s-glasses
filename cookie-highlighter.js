@@ -8,7 +8,7 @@
 /* 
 	External Libraries
 */
-GGVERSION = "1st pair for v.1.0411";
+GGVERSION = "GG-1 for v.1.0411";
 if (!l) {
 	l = function (what) {
 		return document.getElementById(what);
@@ -35,10 +35,10 @@ if (!gg) {
 		var version = l("GrandmaGlassesVersion");
 		if (!version) {
 			var version = document.createElement("div");
-			version.className = "GrandmaGlassesVersion";
-			version.id = "GrandmaGlassesVersion";
+			version.className = "title";
+			version.id = "GG_Version";
 			version.textContent = "Grandma's Glasses, " + GGVERSION;
-			var parent = l("donate");
+			var parent = l("supportComment");
 			parent.insertBefore(version, parent.firstChild);
 		}
 		Game.Popup(version.textContent + " Loaded!");
@@ -64,13 +64,6 @@ if (!gg) {
 				margin: 6px;\
 				font-weight: bold;\
 				text-shadow: -1px 0 3px black, 0 1px 3px black, 1px 0 3px black, 0 -1px 3px black;\
-			}\
-			.GrandmaGlassesVersion {\
-				position: relative;\
-				top: 3px;\
-				right: 3px;\
-				font-size: 12px;\
-				text-shadow: 0px 0px 4px #000;\
 			}";
 		document.body.appendChild(css);
 	}
